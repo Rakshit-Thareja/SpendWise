@@ -1,13 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-function AddExpenseForm({ onAddExpense }) {
-    const [formData, setFormData] = useState({
-        amount: '',
-        category: 'Food',
-        description: '',
-        date: '',
-        paymentMethod: 'UPI',
-    })
+function AddExpenseForm({
+    onAddExpense,
+    initialExpense = null,
+    submitLabel = 'Add Expense',
+}) {
+    const [formData, setFormData] = useState(
+        initialExpense || {
+            amount: '',
+            category: 'Food',
+            description: '',
+            date: '',
+            paymentMethod: 'UPI',
+        }
+    )
+
+    useEffect(() => {
+        if (initialExpense) {
+            setFormData(initialExpense)
+        } else {
+            setFormData({
+                amount: '',
+                category: 'Food',
+                description: '',
+                date: '',
+                paymentMethod: 'UPI',
+            })
+        }
+    }, [initialExpense])
 
     const handleChange = (event) => {
         const { name, value } = event.target
@@ -30,8 +50,10 @@ function AddExpenseForm({ onAddExpense }) {
         }
 
         const newExpense = {
-            id: Date.now(),
             ...formData,
+            id: initialExpense
+                ? initialExpense.id
+                : Date.now(),
             amount: Number(formData.amount),
         }
 
@@ -157,7 +179,7 @@ function AddExpenseForm({ onAddExpense }) {
                     type="submit"
                     className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-500"
                 >
-                    Add Expense
+                    {submitLabel}
                 </button>
 
             </div>

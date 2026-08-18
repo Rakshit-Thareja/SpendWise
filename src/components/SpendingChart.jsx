@@ -8,17 +8,24 @@ import {
     ResponsiveContainer,
 } from 'recharts'
 
-const data = [
-    { day: 'Mon', spending: 1200 },
-    { day: 'Tue', spending: 2100 },
-    { day: 'Wed', spending: 1600 },
-    { day: 'Thu', spending: 2800 },
-    { day: 'Fri', spending: 2200 },
-    { day: 'Sat', spending: 3500 },
-    { day: 'Sun', spending: 1900 },
-]
+function SpendingChart({ expenses }) {
+    const spendingByDate = {}
 
-function SpendingChart() {
+    expenses.forEach((expense) => {
+        if (spendingByDate[expense.date]) {
+            spendingByDate[expense.date] += expense.amount
+        } else {
+            spendingByDate[expense.date] = expense.amount
+        }
+    })
+
+    const data = Object.entries(spendingByDate)
+        .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+        .map(([date, amount]) => ({
+            date,
+            spending: amount,
+        }))
+
     return (
         <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
             <div className="mb-6">
@@ -27,47 +34,59 @@ function SpendingChart() {
                 </h3>
 
                 <p className="text-sm text-gray-400">
-                    Your spending over the last 7 days
+                    Your spending activity
                 </p>
             </div>
 
-            <div className="h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data}>
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="#374151"
-                        />
+            {data.length === 0 ? (
+                <div className="flex h-72 items-center justify-center">
+                    <p className="text-gray-400">
+                        Add some expenses to see your spending trend.
+                    </p>
+                </div>
+            ) : (
+                <div className="h-72 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={data}>
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#374151"
+                            />
 
-                        <XAxis
-                            dataKey="day"
-                            stroke="#9CA3AF"
-                        />
+                            <XAxis
+                                dataKey="date"
+                                stroke="#9CA3AF"
+                            />
 
-                        <YAxis
-                            stroke="#9CA3AF"
-                        />
+                            <YAxis
+                                stroke="#9CA3AF"
+                            />
 
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: '#111827',
-                                border: '1px solid #374151',
-                                borderRadius: '8px',
-                                color: '#fff',
-                            }}
-                        />
+                            <Tooltip
+                                contentStyle={{
+                                    backgroundColor: '#111827',
+                                    border: '1px solid #374151',
+                                    borderRadius: '8px',
+                                    color: '#fff',
+                                }}
+                                formatter={(value) => [
+                                    `₹${value.toLocaleString('en-IN')}`,
+                                    'Spending',
+                                ]}
+                            />
 
-                        <Line
-                            type="monotone"
-                            dataKey="spending"
-                            stroke="#6366F1"
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
+                            <Line
+                                type="monotone"
+                                dataKey="spending"
+                                stroke="#6366F1"
+                                strokeWidth={3}
+                                dot={{ r: 4 }}
+                                activeDot={{ r: 6 }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            )}
         </div>
     )
 }

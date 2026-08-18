@@ -1,9 +1,23 @@
+import IncomeEditor from '../components/IncomeEditor'
 import SummaryCard from '../components/SummaryCard'
 import SpendingChart from '../components/SpendingChart'
 import RecentTransactions from '../components/RecentTransactions'
 
+function Dashboard({
+    expenses,
+    income,
+    onIncomeChange,
+}) {
 
-function Dashboard() {
+    const totalExpenses = expenses.reduce(
+        (total, expense) => total + expense.amount,
+        0
+    )
+
+    const balance = income - totalExpenses
+
+    const savings = balance
+
     return (
         <div>
             <h2 className="text-3xl font-bold">
@@ -15,40 +29,47 @@ function Dashboard() {
             </p>
 
             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+
                 <SummaryCard
                     title="Balance"
-                    amount="₹32,450"
-                    change="+12.5% from last month"
+                    amount={`₹${balance.toLocaleString('en-IN')}`}
+                    change="Current balance"
                     icon="💰"
                 />
 
                 <SummaryCard
                     title="Income"
-                    amount="₹50,000"
-                    change="+8.2% from last month"
+                    amount={`₹${income.toLocaleString('en-IN')}`}
+                    change="Monthly income"
                     icon="📈"
                 />
 
                 <SummaryCard
                     title="Expenses"
-                    amount="₹17,550"
-                    change="-4.3% from last month"
+                    amount={`₹${totalExpenses.toLocaleString('en-IN')}`}
+                    change="Total spending"
                     icon="📉"
                 />
 
                 <SummaryCard
                     title="Savings"
-                    amount="₹32,450"
-                    change="+15.2% from last month"
+                    amount={`₹${savings.toLocaleString('en-IN')}`}
+                    change="Available savings"
                     icon="💵"
                 />
 
-                <div className="mt-6">
-                    <SpendingChart />
-                </div>
+                <IncomeEditor
+                    income={income}
+                    onIncomeChange={onIncomeChange}
+                />
 
-                <RecentTransactions />
             </div>
+
+            <div className="mt-6">
+                <SpendingChart expenses={expenses} />
+            </div>
+
+            <RecentTransactions expenses={expenses} />
         </div>
     )
 }
