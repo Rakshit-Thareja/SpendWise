@@ -1,3 +1,4 @@
+import CategoryBreakdown from '../components/CategoryBreakdown'
 import IncomeEditor from '../components/IncomeEditor'
 import SummaryCard from '../components/SummaryCard'
 import SpendingChart from '../components/SpendingChart'
@@ -65,8 +66,10 @@ function Dashboard({
 
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <SpendingChart expenses={expenses} />
+
+                <CategoryBreakdown expenses={expenses} />
             </div>
 
             <RecentTransactions expenses={expenses} />
