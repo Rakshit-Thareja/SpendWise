@@ -25,6 +25,24 @@ function App() {
       : 50000
   })
 
+  const [budgets, setBudgets] = useState(() => {
+    const savedBudgets = localStorage.getItem('spendwise-budgets')
+
+    return savedBudgets
+      ? JSON.parse(savedBudgets)
+      : {
+        monthly: 20000,
+        categories: {},
+      }
+  })
+
+  useEffect(() => {
+    localStorage.setItem(
+      'spendwise-budgets',
+      JSON.stringify(budgets)
+    )
+  }, [budgets])
+
   const addExpense = (expense) => {
     setExpenses((previousExpenses) => [
       expense,
@@ -48,6 +66,24 @@ function App() {
           : expense
       )
     )
+  }
+
+  const updateMonthlyBudget = (amount) => {
+    setBudgets((previousBudgets) => ({
+      ...previousBudgets,
+      monthly: Number(amount),
+    }))
+  }
+
+  const updateCategoryBudget = (category, amount) => {
+    setBudgets((previousBudgets) => ({
+      ...previousBudgets,
+
+      categories: {
+        ...previousBudgets.categories,
+        [category]: Number(amount),
+      },
+    }))
   }
 
   useEffect(() => {
@@ -92,7 +128,14 @@ function App() {
 
         <Route
           path="/budget"
-          element={<Budget expenses={expenses} />}
+          element={
+            <Budget
+              expenses={expenses}
+              budgets={budgets}
+              onUpdateMonthlyBudget={updateMonthlyBudget}
+              onUpdateCategoryBudget={updateCategoryBudget}
+            />
+          }
         />
 
         <Route
