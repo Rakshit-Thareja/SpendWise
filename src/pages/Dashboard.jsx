@@ -3,6 +3,7 @@ import IncomeEditor from '../components/IncomeEditor'
 import SummaryCard from '../components/SummaryCard'
 import SpendingChart from '../components/SpendingChart'
 import RecentTransactions from '../components/RecentTransactions'
+import FinancialInsights from '../components/FinancialInsights'
 
 function Dashboard({
     expenses,
@@ -72,7 +73,10 @@ function Dashboard({
                 <CategoryBreakdown expenses={expenses} />
             </div>
 
+            <FinancialInsights expenses={expenses} income={income}/>  
+            
             <RecentTransactions expenses={expenses} />
+
         </div>
     )
 }
