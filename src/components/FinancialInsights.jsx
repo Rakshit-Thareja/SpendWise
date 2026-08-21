@@ -39,6 +39,11 @@ function FinancialInsights({ expenses, income }) {
 
     const savings = income - totalExpenses
 
+    const highestCategoryPercentage =
+        totalExpenses > 0
+            ? (highestCategory[1] / totalExpenses) * 100
+            : 0
+
     const savingsPercentage =
         income > 0
             ? Math.max(0, (savings / income) * 100)
@@ -93,6 +98,10 @@ function FinancialInsights({ expenses, income }) {
 
                                     <p className="text-xl font-bold text-indigo-400">
                                         ₹{highestCategory[1].toLocaleString('en-IN')}
+                                    </p>
+                                    <p className="mt-2 text-sm text-gray-400">
+                                        🛍️ {highestCategory[0]} represents{' '}
+                                        {highestCategoryPercentage.toFixed(1)}% of your spending.
                                     </p>
                                 </>
                             ) : (
