@@ -4,6 +4,7 @@ import SummaryCard from '../components/SummaryCard'
 import SpendingChart from '../components/SpendingChart'
 import RecentTransactions from '../components/RecentTransactions'
 import FinancialInsights from '../components/FinancialInsights'
+import CurrencyConverter from '../components/CurrencyConverter'
 
 function Dashboard({
     expenses,
@@ -76,6 +77,8 @@ function Dashboard({
             <FinancialInsights expenses={expenses} income={income}/>  
             
             <RecentTransactions expenses={expenses} />
+
+            <CurrencyConverter />
 
         </div>
     )
