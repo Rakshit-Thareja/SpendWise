@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Expenses from './pages/Expenses'
 import Budget from './pages/Budget'
 import Analytics from './pages/Analytics'
+import CurrencyConverter from './pages/CurrencyConverter'
 
 function App() {
   const [expenses, setExpenses] = useState(() => {
@@ -142,7 +143,14 @@ function App() {
           path="/analytics"
           element={<Analytics expenses={expenses} />}
         />
+
+      <Route
+        path="/currency-converter"
+        element={<CurrencyConverter />}
+      />
+
       </Routes>
+
     </DashboardLayout>
   )
 }

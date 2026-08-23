@@ -4,14 +4,12 @@ import SummaryCard from '../components/SummaryCard'
 import SpendingChart from '../components/SpendingChart'
 import RecentTransactions from '../components/RecentTransactions'
 import FinancialInsights from '../components/FinancialInsights'
-import CurrencyConverter from '../components/CurrencyConverter'
 
 function Dashboard({
     expenses,
     income,
     onIncomeChange,
 }) {
-
     const totalExpenses = expenses.reduce(
         (total, expense) => total + expense.amount,
         0
@@ -22,63 +20,118 @@ function Dashboard({
     const savings = balance
 
     return (
-        <div>
-            <h2 className="text-3xl font-bold">
-                Welcome back 👋
-            </h2>
+        <div className="space-y-8">
 
-            <p className="mt-2 text-gray-400">
-                Here's your financial overview.
-            </p>
+            {/* Header */}
 
-            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div>
+                <p className="text-sm font-medium text-indigo-400">
+                    Financial Overview
+                </p>
 
-                <SummaryCard
-                    title="Balance"
-                    amount={`₹${balance.toLocaleString('en-IN')}`}
-                    change="Current balance"
-                    icon="💰"
-                />
+                <h2 className="mt-1 text-3xl font-bold tracking-tight text-white">
+                    Welcome back 👋
+                </h2>
 
-                <SummaryCard
-                    title="Income"
-                    amount={`₹${income.toLocaleString('en-IN')}`}
-                    change="Monthly income"
-                    icon="📈"
-                />
+                <p className="mt-2 text-gray-400">
+                    Here's your financial overview.
+                </p>
+            </div>
 
-                <SummaryCard
-                    title="Expenses"
-                    amount={`₹${totalExpenses.toLocaleString('en-IN')}`}
-                    change="Total spending"
-                    icon="📉"
-                />
 
-                <SummaryCard
-                    title="Savings"
-                    amount={`₹${savings.toLocaleString('en-IN')}`}
-                    change="Available savings"
-                    icon="💵"
-                />
+            {/* Summary Cards */}
 
+            <section>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+                    <SummaryCard
+                        title="Balance"
+                        amount={`₹${balance.toLocaleString('en-IN')}`}
+                        change="Current balance"
+                        icon="💰"
+                    />
+
+                    <SummaryCard
+                        title="Income"
+                        amount={`₹${income.toLocaleString('en-IN')}`}
+                        change="Monthly income"
+                        icon="📈"
+                    />
+
+                    <SummaryCard
+                        title="Expenses"
+                        amount={`₹${totalExpenses.toLocaleString('en-IN')}`}
+                        change="Total spending"
+                        icon="📉"
+                    />
+
+                    <SummaryCard
+                        title="Savings"
+                        amount={`₹${savings.toLocaleString('en-IN')}`}
+                        change="Available savings"
+                        icon="💵"
+                    />
+
+                </div>
+            </section>
+
+
+            {/* Income Editor */}
+
+            <section>
                 <IncomeEditor
                     income={income}
                     onIncomeChange={onIncomeChange}
                 />
+            </section>
 
-            </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <SpendingChart expenses={expenses} />
+            {/* Charts */}
 
-                <CategoryBreakdown expenses={expenses} />
-            </div>
+            <section>
+                <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-white">
+                        Spending Overview
+                    </h3>
 
-            <FinancialInsights expenses={expenses} income={income}/>  
-            
-            <RecentTransactions expenses={expenses} />
+                    <p className="mt-1 text-sm text-gray-400">
+                        Track where your money is going.
+                    </p>
+                </div>
 
-            <CurrencyConverter />
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                    <SpendingChart expenses={expenses} />
+
+                    <CategoryBreakdown expenses={expenses} />
+                </div>
+            </section>
+
+
+            {/* Financial Insights */}
+
+            <section>
+                <FinancialInsights
+                    expenses={expenses}
+                    income={income}
+                />
+            </section>
+
+
+            {/* Recent Transactions */}
+
+            <section>
+                <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-white">
+                        Recent Transactions
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-400">
+                        Your latest spending activity.
+                    </p>
+                </div>
+
+                <RecentTransactions expenses={expenses} />
+            </section>
 
         </div>
     )
