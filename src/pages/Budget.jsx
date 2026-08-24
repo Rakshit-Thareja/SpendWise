@@ -36,26 +36,30 @@ function Budget({
 
     return (
         <div>
-            <h2 className="text-3xl font-bold">
+            <p className="text-sm font-medium text-indigo-400">
+                Budget Management
+            </p>
+
+            <h2 className="mt-1 text-3xl font-bold tracking-tight text-white">
                 Budget
             </h2>
 
             <p className="mt-2 text-gray-400">
-                Set and manage your spending limits.
+                Set spending limits and keep your expenses on track.
             </p>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5 transition hover:border-gray-700">
                     <p className="text-sm text-gray-400">
                         Monthly Budget
                     </p>
 
-                    <p className="mt-2 text-2xl font-bold">
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-white">
                         ₹{monthlyBudget.toLocaleString('en-IN')}
                     </p>
                 </div>
 
-                <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 transition hover:border-gray-700">
                     <p className="text-sm text-gray-400">
                         Total Spent
                     </p>
@@ -65,15 +69,15 @@ function Budget({
                     </p>
                 </div>
 
-                <div className="rounded-xl border border-gray-800 bg-gray-900 p-5">
+                <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 transition hover:border-gray-700">
                     <p className="text-sm text-gray-400">
                         Remaining
                     </p>
 
                     <p
-                        className={`mt-2 text-2xl font-bold ${monthlyRemaining < 0
-                                ? 'text-red-400'
-                                : 'text-green-400'
+                        className={`mt-2 text-2xl font-bold tracking-light ${monthlyRemaining < 0
+                            ? 'text-red-400'
+                            : 'text-green-400'
                             }`}
                     >
                         ₹{Math.abs(monthlyRemaining).toLocaleString('en-IN')}
@@ -81,7 +85,7 @@ function Budget({
                 </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2 ">
                 <BudgetForm
                     budgets={budgets}
                     onUpdateMonthlyBudget={onUpdateMonthlyBudget}
@@ -91,10 +95,16 @@ function Budget({
 
             {/* Monthly Budget */}
 
-            <div className="mt-8 rounded-xl border border-gray-800 bg-gray-900 p-6">
-                <h3 className="text-xl font-semibold">
-                    Monthly Budget
-                </h3>
+            <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
+                <div>
+                    <h3 className="text-xl font-semibold text-white">
+                        Monthly Budget
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-400">
+                        Track your spending against your monthly limit.
+                    </p>
+                </div>
 
                 <div className="mt-5 flex items-end justify-between">
                     <div>
@@ -107,14 +117,20 @@ function Budget({
                         </p>
                     </div>
 
-                    <p className="text-sm text-gray-400">
-                        {monthlyPercentage.toFixed(0)}% used
-                    </p>
+                    <div className="text-right">
+                        <p className="text-2xl font-bold text-white">
+                            {monthlyPercentage.toFixed(0)}%
+                        </p>
+
+                        <p className="text-xs text-gray-500">
+                            used
+                        </p>
+                    </div>
                 </div>
 
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-gray-800">
+                <div className="mt-5 h-3 overflow-hidden rounded-full bg-gray-800">
                     <div
-                        className={`h-full rounded-full ${monthlyPercentage >= 90
+                        className={`h-full rounded-full transition-all duration-500 ${monthlyPercentage >= 90
                             ? 'bg-red-500'
                             : monthlyPercentage >= 80
                                 ? 'bg-yellow-500'
@@ -126,17 +142,29 @@ function Budget({
                     />
                 </div>
 
-                <p className="mt-3 text-sm text-gray-400">
-                    {monthlyRemaining >= 0
-                        ? `₹${monthlyRemaining.toLocaleString(
-                            'en-IN'
-                        )} remaining`
-                        : `₹${Math.abs(
-                            monthlyRemaining
-                        ).toLocaleString(
-                            'en-IN'
-                        )} over budget`}
-                </p>
+                <div className="mt-4 flex items-center justify-between">
+                    <p
+                        className={`text-sm font-medium ${monthlyRemaining >= 0
+                                ? 'text-green-400'
+                                : 'text-red-400'
+                            }`}
+                    >
+                        {monthlyRemaining >= 0
+                            ? `₹${monthlyRemaining.toLocaleString('en-IN')} remaining`
+                            : `₹${Math.abs(monthlyRemaining).toLocaleString('en-IN')} over budget`}
+                    </p>
+
+                    <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${monthlyRemaining >= 0
+                                ? 'bg-green-500/10 text-green-400'
+                                : 'bg-red-500/10 text-red-400'
+                            }`}
+                    >
+                        {monthlyRemaining >= 0
+                            ? 'On Track'
+                            : 'Over Budget'}
+                    </span>
+                </div>
 
                 {monthlyPercentage >= 80 && (
                     <p
@@ -155,9 +183,15 @@ function Budget({
             {/* Category Budgets */}
 
             <div className="mt-6">
-                <h3 className="text-xl font-semibold">
-                    Category Budgets
-                </h3>
+                <div>
+                    <h3 className="text-xl font-semibold text-white">
+                        Category Budgets
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-400">
+                        Keep track of spending limits for each category.
+                    </p>
+                </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                     {Object.entries(budgets.categories).map(
@@ -179,27 +213,25 @@ function Budget({
                             return (
                                 <div
                                     key={category}
-                                    className="rounded-xl border border-gray-800 bg-gray-900 p-5"
+                                    className="rounded-2xl border border-gray-800 bg-gray-900 p-5 transition hover:-translate-y-0.5 hover:border-gray-700 hover:shadow-lg hover:shadow-black/20"
                                 >
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-semibold">
+                                        <h4 className="font-semibold text-white">
                                             {category}
                                         </h4>
 
-                                        <span className="text-sm text-gray-400">
+                                        <span className="rounded-full bg-gray-800 px-2.5 py-1 text-xs font-medium text-gray-300">
                                             {percentage.toFixed(0)}%
                                         </span>
                                     </div>
 
-                                    <div className="mt-3 flex justify-between text-sm">
-                                        <span>
+                                    <div className="mt-4 flex justify-between text-sm">
+                                        <span className="font-medium text-white">
                                             ₹{spent.toLocaleString('en-IN')}
                                         </span>
 
-                                        <span className="text-gray-400">
-                                            ₹{budgetAmount.toLocaleString(
-                                                'en-IN'
-                                            )}
+                                        <span className="text-gray-500">
+                                            of ₹{budgetAmount.toLocaleString('en-IN')}
                                         </span>
                                     </div>
 
