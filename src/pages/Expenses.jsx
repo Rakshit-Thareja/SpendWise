@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AddExpenseForm from '../components/AddExpenseForm'
 
 function Expenses({
@@ -7,10 +7,49 @@ function Expenses({
     onDeleteExpense,
     onUpdateExpense,
 }) {
+    const [successMessage, setSuccessMessage] = useState('')
     const [editingExpense, setEditingExpense] = useState(null)
 
     const [searchTerm, setSearchTerm] = useState('')
     const [categoryFilter, setCategoryFilter] = useState('All')
+
+    const successTimeoutRef = useRef(null)
+
+    useEffect(() => {
+        return () => {
+            if (successTimeoutRef.current) {
+                clearTimeout(successTimeoutRef.current)
+            }
+        }
+    }, [])
+
+    const clearSuccessTimeout = () => {
+        if (successTimeoutRef.current) {
+            clearTimeout(successTimeoutRef.current)
+            successTimeoutRef.current = null
+        }
+    }
+
+    const showSuccessMessage = (message, onComplete) => {
+        clearSuccessTimeout()
+
+        setSuccessMessage(message)
+
+        successTimeoutRef.current = setTimeout(() => {
+            setSuccessMessage('')
+            successTimeoutRef.current = null
+
+            if (onComplete) {
+                onComplete()
+            }
+        }, 3000)
+    }
+
+    const startEditing = (expense) => {
+        clearSuccessTimeout()
+        setSuccessMessage('')
+        setEditingExpense(expense)
+    }
 
     const filteredExpenses = expenses.filter((expense) => {
         const matchesSearch =
@@ -25,9 +64,11 @@ function Expenses({
         return matchesSearch && matchesCategory
     })
 
-
     return (
         <div>
+
+            {/* Header */}
+
             <p className="text-sm font-medium text-indigo-400">
                 Expense Management
             </p>
@@ -40,15 +81,24 @@ function Expenses({
                 Track, manage, and review your spending.
             </p>
 
+            {/* Expense Form */}
+
             <div className="mt-10 max-w-2xl">
 
                 {editingExpense && (
                     <div className="mb-6">
                         <AddExpenseForm
                             initialExpense={editingExpense}
+                            successMessage={successMessage}
                             onAddExpense={(updatedExpense) => {
                                 onUpdateExpense(updatedExpense)
-                                setEditingExpense(null)
+
+                                showSuccessMessage(
+                                    'Expense updated successfully.',
+                                    () => {
+                                        setEditingExpense(null)
+                                    }
+                                )
                             }}
                             submitLabel="Update Expense"
                         />
@@ -57,13 +107,24 @@ function Expenses({
 
                 {!editingExpense && (
                     <AddExpenseForm
-                        onAddExpense={onAddExpense}
+                        successMessage={successMessage}
+                        onAddExpense={(newExpense) => {
+                            onAddExpense(newExpense)
+
+                            showSuccessMessage(
+                                'Expense added successfully.'
+                            )
+                        }}
                     />
                 )}
+
             </div>
 
+            {/* Expenses */}
+
             <div className="mt-8">
-                <h3 className="text-xl font-semibold">
+
+                <h3 className="text-xl font-semibold text-white">
                     Your Expenses
                 </h3>
 
@@ -71,40 +132,64 @@ function Expenses({
                     Search and filter your transactions.
                 </p>
 
+                {/* Search & Filter */}
+
                 <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+
                     <input
                         type="text"
                         placeholder="Search expenses..."
                         value={searchTerm}
-                        onChange={(event) => setSearchTerm(event.target.value)}
+                        onChange={(event) =>
+                            setSearchTerm(event.target.value)
+                        }
                         className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     />
 
                     <select
                         value={categoryFilter}
-                        onChange={(event) => setCategoryFilter(event.target.value)}
+                        onChange={(event) =>
+                            setCategoryFilter(event.target.value)
+                        }
                         className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     >
-                        <option value="All">All Categories</option>
+                        <option value="All">
+                            All Categories
+                        </option>
+
                         <option value="Food">Food</option>
                         <option value="Transport">Transport</option>
                         <option value="Shopping">Shopping</option>
                         <option value="Housing">Housing</option>
                         <option value="Bills">Bills</option>
-                        <option value="Entertainment">Entertainment</option>
+                        <option value="Entertainment">
+                            Entertainment
+                        </option>
                         <option value="Education">Education</option>
                         <option value="Health">Health</option>
                         <option value="Other">Other</option>
                     </select>
+
                 </div>
+
+                {/* Result Count */}
+
                 <p className="mt-3 text-sm text-gray-500">
                     Showing {filteredExpenses.length} expenses
                 </p>
+
+                {/* Expense List */}
+
                 <div className="mt-4 space-y-3">
+
                     {filteredExpenses.length === 0 ? (
+
                         <div className="rounded-xl border border-dashed border-gray-700 bg-gray-900/50 p-8 text-center">
+
                             <div className="text-4xl">
-                                {expenses.length === 0 ? '💸' : '🔍'}
+                                {expenses.length === 0
+                                    ? '💸'
+                                    : '🔍'}
                             </div>
 
                             <h4 className="mt-3 font-semibold text-white">
@@ -118,14 +203,19 @@ function Expenses({
                                     ? 'Add your first expense to start tracking your spending.'
                                     : 'Try changing your search or category filter.'}
                             </p>
+
                         </div>
+
                     ) : (
+
                         filteredExpenses.map((expense) => (
 
                             <div
                                 key={expense.id}
                                 className="flex flex-col gap-4 rounded-xl border border-gray-800 bg-gray-900 p-4 transition hover:border-gray-700 sm:flex-row sm:items-center sm:justify-between"
                             >
+
+                                {/* Expense Information */}
 
                                 <div className="flex items-center gap-3">
 
@@ -153,6 +243,8 @@ function Expenses({
 
                                 </div>
 
+                                {/* Amount & Actions */}
+
                                 <div className="flex items-center gap-2 sm:justify-end">
 
                                     <p className="mr-2 font-semibold text-red-400">
@@ -160,25 +252,33 @@ function Expenses({
                                     </p>
 
                                     <button
-                                        onClick={() => setEditingExpense(expense)}
+                                        onClick={() =>
+                                            startEditing(expense)
+                                        }
                                         className="rounded-lg px-3 py-2 text-sm text-indigo-400 transition hover:bg-indigo-500/10"
                                     >
                                         Edit
                                     </button>
 
                                     <button
-                                        onClick={() => onDeleteExpense(expense.id)}
+                                        onClick={() =>
+                                            onDeleteExpense(expense.id)
+                                        }
                                         className="rounded-lg px-3 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
                                     >
                                         Delete
                                     </button>
 
                                 </div>
+
                             </div>
+
                         ))
                     )}
+
                 </div>
             </div>
+
         </div>
     )
 }

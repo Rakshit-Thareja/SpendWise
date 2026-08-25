@@ -4,13 +4,21 @@ function AddExpenseForm({
     onAddExpense,
     initialExpense = null,
     submitLabel = 'Add Expense',
+    successMessage = '',
 }) {
+    const getToday = () => {
+        return new Date().toISOString().split('T')[0]
+    }
+
+    const [error, setError] = useState('')
+    const [saving, setSaving] = useState(false)
+
     const [formData, setFormData] = useState(
         initialExpense || {
             amount: '',
             category: 'Food',
             description: '',
-            date: '',
+            date: getToday(),
             paymentMethod: 'UPI',
         }
     )
@@ -23,10 +31,12 @@ function AddExpenseForm({
                 amount: '',
                 category: 'Food',
                 description: '',
-                date: '',
+                date: getToday(),
                 paymentMethod: 'UPI',
             })
         }
+
+        setError('')
     }, [initialExpense])
 
     const handleChange = (event) => {
@@ -36,18 +46,35 @@ function AddExpenseForm({
             ...previous,
             [name]: value,
         }))
+
+        setError('')
     }
 
     const handleSubmit = (event) => {
         event.preventDefault()
 
-        if (
-            !formData.amount ||
-            !formData.description ||
-            !formData.date
-        ) {
+        if (saving) {
             return
         }
+
+        setError('')
+
+        if (!formData.amount || Number(formData.amount) <= 0) {
+            setError('Please enter a valid amount.')
+            return
+        }
+
+        if (!formData.description.trim()) {
+            setError('Please add a description.')
+            return
+        }
+
+        if (!formData.date) {
+            setError('Please select a date.')
+            return
+        }
+
+        setSaving(true)
 
         const newExpense = {
             ...formData,
@@ -55,17 +82,25 @@ function AddExpenseForm({
                 ? initialExpense.id
                 : Date.now(),
             amount: Number(formData.amount),
+            description: formData.description.trim(),
         }
 
         onAddExpense(newExpense)
 
-        setFormData({
-            amount: '',
-            category: 'Food',
-            description: '',
-            date: '',
-            paymentMethod: 'UPI',
-        })
+        // Only reset the form when adding a NEW expense.
+        // When editing, keep the updated values visible
+        // until the parent switches back to Add Expense.
+        if (!initialExpense) {
+            setFormData({
+                amount: '',
+                category: 'Food',
+                description: '',
+                date: getToday(),
+                paymentMethod: 'UPI',
+            })
+        }
+
+        setSaving(false)
     }
 
     return (
@@ -74,16 +109,19 @@ function AddExpenseForm({
             className="rounded-xl border border-gray-800 bg-gray-900 p-6"
         >
             <h3 className="text-xl font-semibold text-white">
-                Add Expense
+                {initialExpense ? 'Edit Expense' : 'Add Expense'}
             </h3>
 
             <p className="mt-1 text-sm text-gray-400">
-                Record a new transaction.
+                {initialExpense
+                    ? 'Update your transaction details.'
+                    : 'Record a new transaction.'}
             </p>
 
             <div className="mt-6 space-y-5">
 
                 {/* Amount */}
+
                 <div>
                     <label className="mb-2 block text-sm text-gray-300">
                         Amount
@@ -101,6 +139,7 @@ function AddExpenseForm({
                 </div>
 
                 {/* Category */}
+
                 <div>
                     <label className="mb-2 block text-sm text-gray-300">
                         Category
@@ -125,6 +164,7 @@ function AddExpenseForm({
                 </div>
 
                 {/* Description */}
+
                 <div>
                     <label className="mb-2 block text-sm text-gray-300">
                         Description
@@ -141,6 +181,7 @@ function AddExpenseForm({
                 </div>
 
                 {/* Date */}
+
                 <div>
                     <label className="mb-2 block text-sm text-gray-300">
                         Date
@@ -156,6 +197,7 @@ function AddExpenseForm({
                 </div>
 
                 {/* Payment Method */}
+
                 <div>
                     <label className="mb-2 block text-sm text-gray-300">
                         Payment Method
@@ -175,11 +217,30 @@ function AddExpenseForm({
                     </select>
                 </div>
 
+                {/* Error */}
+
+                {error && (
+                    <p className="text-sm text-red-400">
+                        ⚠️ {error}
+                    </p>
+                )}
+
+                {/* Success */}
+
+                {successMessage && (
+                    <p className="text-sm text-green-400">
+                        ✅ {successMessage}
+                    </p>
+                )}
+
+                {/* Submit Button */}
+
                 <button
                     type="submit"
-                    className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-500"
+                    disabled={saving}
+                    className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    {submitLabel}
+                    {saving ? 'Saving...' : submitLabel}
                 </button>
 
             </div>
