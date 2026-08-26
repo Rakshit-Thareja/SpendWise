@@ -120,16 +120,6 @@ function Dashboard({
             {/* Recent Transactions */}
 
             <section>
-                <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-white">
-                        Recent Transactions
-                    </h3>
-
-                    <p className="mt-1 text-sm text-gray-400">
-                        Your latest spending activity.
-                    </p>
-                </div>
-
                 <RecentTransactions expenses={expenses} />
             </section>
 
