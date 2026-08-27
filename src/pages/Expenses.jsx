@@ -15,6 +15,16 @@ function Expenses({
 
     const successTimeoutRef = useRef(null)
 
+    const [expenseToDelete, setExpenseToDelete] = useState(null)
+
+    const confirmDelete = () => {
+        if (expenseToDelete) {
+            onDeleteExpense(expenseToDelete.id)
+            showSuccessMessage("Expense deleted Successfully")
+            setExpenseToDelete(null)
+        }
+    }
+
     useEffect(() => {
         return () => {
             if (successTimeoutRef.current) {
@@ -261,14 +271,56 @@ function Expenses({
                                     </button>
 
                                     <button
-                                        onClick={() =>
-                                            onDeleteExpense(expense.id)
-                                        }
+                                        onClick={() => {
+                                            setExpenseToDelete(expense)
+                                        }}
                                         className="rounded-lg px-3 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
                                     >
                                         Delete
                                     </button>
 
+                                    {expenseToDelete && (
+                                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                                            <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6">
+
+                                                <h3 className="text-xl font-semibold text-white">
+                                                    Delete Expense?
+                                                </h3>
+
+                                                <p className="mt-2 text-sm text-gray-400">
+                                                    Are you sure you want to delete this expense?
+                                                </p>
+
+                                                <p className="mt-4 font-medium text-white">
+                                                    {expenseToDelete.description}
+                                                </p>
+
+                                                <p className="mt-1 text-red-400">
+                                                    -₹{expenseToDelete.amount.toLocaleString('en-IN')}
+                                                </p>
+
+                                                <div className="mt-6 flex justify-end gap-3">
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setExpenseToDelete(null)}
+                                                        className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800"
+                                                    >
+                                                        Cancel
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={confirmDelete}
+                                                        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
+                                                    >
+                                                        Delete
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                             </div>
