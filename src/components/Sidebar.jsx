@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 
-function Sidebar() {
+function Sidebar({ menuOpen, setMenuOpen }) {
     const links = [
         { name: 'Dashboard', path: '/', icon: '🏠' },
         { name: 'Expenses', path: '/expenses', icon: '💸' },
@@ -14,17 +14,20 @@ function Sidebar() {
     ]
 
     return (
-        <aside className="w-full border-b border-gray-800 bg-gray-950 p-3 sm:min-h-[calc(100vh-4rem)] sm:w-60 sm:border-b-0 sm:border-r">
+        <aside
+            className={`w-full border-b border-gray-800 bg-gray-950 p-3 sm:min-h-[calc(100vh-4rem)] sm:w-60 sm:border-b-0 sm:border-r ${menuOpen ? 'block' : 'hidden'
+                } sm:block`}
+        >
             <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:gap-1">
                 {links.map((link) => (
                     <NavLink
+                        onClick={() => setMenuOpen(false)}
                         key={link.path}
                         to={link.path}
                         className={({ isActive }) =>
-                            `flex shrink-0 items-center rounded-lg px-4 py-3 text-sm transition ${
-                                isActive
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'text-gray-400 hover:bg-gray-900 hover:text-white'
+                            `flex shrink-0 items-center rounded-lg px-4 py-3 text-sm transition ${isActive
+                                ? 'bg-indigo-600 text-white shadow-sm'
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white'
                             }`
                         }
                     >
