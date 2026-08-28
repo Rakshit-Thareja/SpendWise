@@ -17,6 +17,24 @@ function Expenses({
 
     const [expenseToDelete, setExpenseToDelete] = useState(null)
 
+    useEffect(() => {
+        if (!expenseToDelete) {
+            return
+        }
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setExpenseToDelete(null)
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [expenseToDelete])
+
     const confirmDelete = () => {
         if (expenseToDelete) {
             onDeleteExpense(expenseToDelete.id)
@@ -58,6 +76,7 @@ function Expenses({
     const startEditing = (expense) => {
         clearSuccessTimeout()
         setSuccessMessage('')
+        setExpenseToDelete(null)
         setEditingExpense(expense)
     }
 
@@ -279,50 +298,71 @@ function Expenses({
                                         Delete
                                     </button>
 
-                                    {expenseToDelete && (
-                                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                                            <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6">
+                                </div>
+                                {expenseToDelete && (
+                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+                                        <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
 
-                                                <h3 className="text-xl font-semibold text-white">
-                                                    Delete Expense?
-                                                </h3>
+                                            {/* Icon */}
 
-                                                <p className="mt-2 text-sm text-gray-400">
-                                                    Are you sure you want to delete this expense?
-                                                </p>
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-2xl">
+                                                ⚠️
+                                            </div>
 
-                                                <p className="mt-4 font-medium text-white">
+                                            {/* Content */}
+
+                                            <h3 className="mt-4 text-xl font-semibold text-white">
+                                                Delete Expense?
+                                            </h3>
+
+                                            <p className="mt-2 text-sm leading-6 text-gray-400">
+                                                This action cannot be undone. Are you sure you want to
+                                                permanently delete this expense?
+                                            </p>
+
+                                            {/* Expense */}
+
+                                            <div className="mt-4 rounded-xl border border-gray-800 bg-gray-950 p-4">
+                                                <p className="font-medium text-white">
                                                     {expenseToDelete.description}
                                                 </p>
 
-                                                <p className="mt-1 text-red-400">
-                                                    -₹{expenseToDelete.amount.toLocaleString('en-IN')}
-                                                </p>
+                                                <div className="mt-1 flex items-center justify-between">
+                                                    <p className="text-sm text-gray-500">
+                                                        {expenseToDelete.category}
+                                                    </p>
 
-                                                <div className="mt-6 flex justify-end gap-3">
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setExpenseToDelete(null)}
-                                                        className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800"
-                                                    >
-                                                        Cancel
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={confirmDelete}
-                                                        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500"
-                                                    >
-                                                        Delete
-                                                    </button>
-
+                                                    <p className="font-semibold text-red-400">
+                                                        -₹{expenseToDelete.amount.toLocaleString('en-IN')}
+                                                    </p>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
 
+                                            {/* Actions */}
+
+                                            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setExpenseToDelete(null)}
+                                                    className="rounded-lg border border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800"
+                                                >
+                                                    Cancel
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={confirmDelete}
+                                                    className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
+                                                >
+                                                    Delete Expense
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                         ))
