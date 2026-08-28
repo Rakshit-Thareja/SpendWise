@@ -9,33 +9,62 @@ import Budget from './pages/Budget'
 import Analytics from './pages/Analytics'
 import CurrencyConverter from './pages/CurrencyConverter'
 
+const getStoredData = (key, fallback, validator) => {
+  try {
+    const savedData = localStorage.getItem(key)
+
+    if (!savedData) {
+      return fallback
+    }
+
+    const parsedData = JSON.parse(savedData)
+
+    return validator(parsedData)
+      ? parsedData
+      : fallback
+
+  } catch (error) {
+    console.error(
+      `Failed to load ${key} from localStorage`,
+      error
+    )
+
+    return fallback
+  }
+}
+
+const getStoredNumber = (key, fallback) => {
+  const savedValue = localStorage.getItem(key)
+
+  const number = Number(savedValue)
+
+  return savedValue !== null && Number.isFinite(number)
+    ? number
+    : fallback
+}
+
 function App() {
-  const [expenses, setExpenses] = useState(() => {
-    const savedExpenses = localStorage.getItem('spendwise-expenses')
+  const [expenses, setExpenses] = useState(() =>
+    getStoredData('spendwise-expenses', [], Array.isArray)
+  )
 
-    return savedExpenses
-      ? JSON.parse(savedExpenses)
-      : []
-  })
+  const [income, setIncome] = useState(() =>
+    getStoredNumber('spendwise-income', 50000)
+  )
 
-  const [income, setIncome] = useState(() => {
-    const savedIncome = localStorage.getItem('spendwise-income')
-
-    return savedIncome
-      ? Number(savedIncome)
-      : 50000
-  })
-
-  const [budgets, setBudgets] = useState(() => {
-    const savedBudgets = localStorage.getItem('spendwise-budgets')
-
-    return savedBudgets
-      ? JSON.parse(savedBudgets)
-      : {
-        monthly: 20000,
-        categories: {},
-      }
-  })
+  const [budgets, setBudgets] = useState(() =>
+  getStoredData(
+    'spendwise-budgets',
+    {
+      monthly: 20000,
+      categories: {},
+    },
+    (data) =>
+      data !== null &&
+      typeof data === 'object' &&
+      !Array.isArray(data)
+  )
+)
 
   useEffect(() => {
     localStorage.setItem(
@@ -144,10 +173,10 @@ function App() {
           element={<Analytics expenses={expenses} />}
         />
 
-      <Route
-        path="/currency-converter"
-        element={<CurrencyConverter />}
-      />
+        <Route
+          path="/currency-converter"
+          element={<CurrencyConverter />}
+        />
 
       </Routes>
 
