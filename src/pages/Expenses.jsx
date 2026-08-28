@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import AddExpenseForm from '../components/AddExpenseForm'
+import categories from '../constants/categories'
 
 function Expenses({
     expenses,
@@ -182,21 +183,13 @@ function Expenses({
                         }
                         className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     >
-                        <option value="All">
-                            All Categories
-                        </option>
+                        <option value="All">All Categories</option>
 
-                        <option value="Food">Food</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Shopping">Shopping</option>
-                        <option value="Housing">Housing</option>
-                        <option value="Bills">Bills</option>
-                        <option value="Entertainment">
-                            Entertainment
-                        </option>
-                        <option value="Education">Education</option>
-                        <option value="Health">Health</option>
-                        <option value="Other">Other</option>
+                        {Object.keys(categories).map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
                     </select>
 
                 </div>
@@ -249,15 +242,7 @@ function Expenses({
                                 <div className="flex items-center gap-3">
 
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-800 text-lg">
-                                        {expense.category === 'Food' && '🍔'}
-                                        {expense.category === 'Transport' && '🚗'}
-                                        {expense.category === 'Shopping' && '🛍️'}
-                                        {expense.category === 'Housing' && '🏠'}
-                                        {expense.category === 'Bills' && '🧾'}
-                                        {expense.category === 'Entertainment' && '🎮'}
-                                        {expense.category === 'Education' && '📚'}
-                                        {expense.category === 'Health' && '❤️'}
-                                        {expense.category === 'Other' && '📦'}
+                                        {categories[expense.category] || '📦'}
                                     </div>
 
                                     <div>

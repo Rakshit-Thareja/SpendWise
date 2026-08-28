@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import categories from '../constants/categories'
 
 function AddExpenseForm({
     onAddExpense,
@@ -151,15 +152,11 @@ function AddExpenseForm({
                         onChange={handleChange}
                         className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     >
-                        <option>Food</option>
-                        <option>Transport</option>
-                        <option>Shopping</option>
-                        <option>Housing</option>
-                        <option>Bills</option>
-                        <option>Entertainment</option>
-                        <option>Education</option>
-                        <option>Health</option>
-                        <option>Other</option>
+                        {Object.keys(categories).map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
