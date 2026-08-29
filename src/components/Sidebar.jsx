@@ -6,11 +6,8 @@ function Sidebar({ menuOpen, setMenuOpen }) {
         { name: 'Expenses', path: '/expenses', icon: '💸' },
         { name: 'Budget', path: '/budget', icon: '🎯' },
         { name: 'Analytics', path: '/analytics', icon: '📊' },
-        {
-            name: 'Currency Converter',
-            path: '/currency-converter',
-            icon: '💱',
-        },
+        {name: 'Currency Converter', path: '/currency-converter', icon: '💱',},
+        { name: 'Settings', path: '/settings', icon: '⚙️' },
     ]
 
     return (

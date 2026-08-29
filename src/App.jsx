@@ -8,6 +8,8 @@ import Expenses from './pages/Expenses'
 import Budget from './pages/Budget'
 import Analytics from './pages/Analytics'
 import CurrencyConverter from './pages/CurrencyConverter'
+import Settings from './pages/Settings'
+
 
 const getStoredData = (key, fallback, validator) => {
   try {
@@ -53,18 +55,18 @@ function App() {
   )
 
   const [budgets, setBudgets] = useState(() =>
-  getStoredData(
-    'spendwise-budgets',
-    {
-      monthly: 20000,
-      categories: {},
-    },
-    (data) =>
-      data !== null &&
-      typeof data === 'object' &&
-      !Array.isArray(data)
+    getStoredData(
+      'spendwise-budgets',
+      {
+        monthly: 20000,
+        categories: {},
+      },
+      (data) =>
+        data !== null &&
+        typeof data === 'object' &&
+        !Array.isArray(data)
+    )
   )
-)
 
   useEffect(() => {
     localStorage.setItem(
@@ -130,6 +132,12 @@ function App() {
     )
   }, [income])
 
+  const restoreData = (backupData) => {
+    setExpenses(backupData.expenses)
+    setIncome(backupData.income)
+    setBudgets(backupData.budgets)
+  }
+
   return (
     <DashboardLayout>
       <Routes>
@@ -157,18 +165,6 @@ function App() {
         />
 
         <Route
-          path="/budget"
-          element={
-            <Budget
-              expenses={expenses}
-              budgets={budgets}
-              onUpdateMonthlyBudget={updateMonthlyBudget}
-              onUpdateCategoryBudget={updateCategoryBudget}
-            />
-          }
-        />
-
-        <Route
           path="/analytics"
           element={<Analytics expenses={expenses} />}
         />
@@ -176,6 +172,26 @@ function App() {
         <Route
           path="/currency-converter"
           element={<CurrencyConverter />}
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <Settings
+              expenses={expenses}
+              income={income}
+              budgets={budgets}
+              onResetData={() => {
+                setExpenses([])
+                setIncome(50000)
+                setBudgets({
+                  monthly: 20000,
+                  categories: {},
+                })
+              }}
+              onRestoreData={restoreData}
+            />
+          }
         />
 
       </Routes>
