@@ -285,7 +285,7 @@ function Expenses({
 
                                 </div>
                                 {expenseToDelete && (
-                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-sm">
                                         <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
 
                                             {/* Icon */}

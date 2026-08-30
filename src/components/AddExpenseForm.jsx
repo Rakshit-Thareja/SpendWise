@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import categories from '../constants/categories'
 
+import Button from './Button'
+
 function AddExpenseForm({
     onAddExpense,
     initialExpense = null,
@@ -232,13 +234,13 @@ function AddExpenseForm({
 
                 {/* Submit Button */}
 
-                <button
+                <Button
                     type="submit"
                     disabled={saving}
-                    className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    className='w-full'
                 >
                     {saving ? 'Saving...' : submitLabel}
-                </button>
+                </Button>
 
             </div>
         </form>
