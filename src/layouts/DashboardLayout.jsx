@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
+import Footer from '../components/footer'
 import { useState } from 'react'
 
 function DashboardLayout({ children }) {
@@ -24,6 +25,7 @@ function DashboardLayout({ children }) {
                     {children}
                 </main>
             </div>
+            <Footer/>
         </div>
     )
 }
