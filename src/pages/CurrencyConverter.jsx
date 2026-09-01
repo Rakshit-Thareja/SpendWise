@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Button from '../components/Button'
 
 function CurrencyConverter() {
     const [error, setError] = useState(null)
@@ -76,17 +77,27 @@ function CurrencyConverter() {
     const convertedAmount = Number(amount) * rate
 
     return (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
+    <div className="space-y-8">
 
-            {/* Header */}
+        {/* Page Header */}
 
-            <h2 className="text-2xl font-bold text-white">
-                💱 Currency Converter
+        <div>
+            <p className="text-sm font-medium text-indigo-400">
+                Currency Tools
+            </p>
+
+            <h2 className="mt-1 text-3xl font-bold tracking-tight text-white">
+                Currency Converter
             </h2>
 
-            <p className="mt-1 mb-6 text-sm text-gray-400">
+            <p className="mt-2 text-gray-400">
                 Convert currencies using live exchange rates.
             </p>
+        </div>
+
+        {/* Converter Card */}
+
+        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
 
             {/* Currency Selection */}
 
@@ -178,14 +189,14 @@ function CurrencyConverter() {
 
             {/* Convert Button */}
 
-            <button
+            <Button
                 type="button"
                 onClick={handleConvert}
                 disabled={loading || currencies.length === 0}
-                className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full"
             >
                 {loading ? 'Converting...' : 'Convert'}
-            </button>
+            </Button>
 
             {/* Error */}
 
@@ -224,6 +235,8 @@ function CurrencyConverter() {
             )}
 
         </div>
+
+    </div>    
     )
 }
 

@@ -10,6 +10,15 @@ import Analytics from './pages/Analytics'
 import CurrencyConverter from './pages/CurrencyConverter'
 import Settings from './pages/Settings'
 
+const demoExpenses = [
+  { id: 101, amount: 6800, category: 'Housing', description: 'Apartment rent', date: '2026-08-01', paymentMethod: 'Bank Transfer' },
+  { id: 102, amount: 1240, category: 'Food', description: 'Weekly groceries', date: '2026-08-04', paymentMethod: 'UPI' },
+  { id: 103, amount: 420, category: 'Transport', description: 'Metro recharge', date: '2026-08-08', paymentMethod: 'UPI' },
+  { id: 104, amount: 1850, category: 'Education', description: 'Online course', date: '2026-08-12', paymentMethod: 'Credit Card' },
+  { id: 105, amount: 760, category: 'Entertainment', description: 'Concert tickets', date: '2026-08-18', paymentMethod: 'UPI' },
+  { id: 106, amount: 990, category: 'Food', description: 'Team dinner', date: '2026-08-24', paymentMethod: 'UPI' },
+]
+
 
 const getStoredData = (key, fallback, validator) => {
   try {
@@ -138,6 +147,15 @@ function App() {
     setBudgets(backupData.budgets)
   }
 
+  const loadDemoData = () => {
+    setExpenses(demoExpenses)
+    setIncome(50000)
+    setBudgets({
+      monthly: 18000,
+      categories: { Food: 5000, Transport: 2500, Entertainment: 3000 },
+    })
+  }
+
   return (
     <DashboardLayout>
       <Routes>
@@ -148,6 +166,7 @@ function App() {
               expenses={expenses}
               income={income}
               onIncomeChange={setIncome}
+              onLoadDemoData={loadDemoData}
             />
           }
         />
@@ -160,6 +179,18 @@ function App() {
               onAddExpense={addExpense}
               onDeleteExpense={deleteExpense}
               onUpdateExpense={updateExpense}
+            />
+          }
+        />
+
+        <Route
+          path="/budget"
+          element={
+            <Budget
+              expenses={expenses}
+              budgets={budgets}
+              onUpdateMonthlyBudget={updateMonthlyBudget}
+              onUpdateCategoryBudget={updateCategoryBudget}
             />
           }
         />

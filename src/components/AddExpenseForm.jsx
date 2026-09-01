@@ -121,7 +121,7 @@ function AddExpenseForm({
                     : 'Record a new transaction.'}
             </p>
 
-            <div className="mt-6 space-y-5">
+            <div className="mt-5 space-y-5">
 
                 {/* Amount */}
 

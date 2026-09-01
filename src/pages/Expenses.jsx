@@ -39,7 +39,7 @@ function Expenses({
     const confirmDelete = () => {
         if (expenseToDelete) {
             onDeleteExpense(expenseToDelete.id)
-            showSuccessMessage("Expense deleted Successfully")
+            showSuccessMessage('Expense deleted successfully.')
             setExpenseToDelete(null)
         }
     }
@@ -94,6 +94,55 @@ function Expenses({
         return matchesSearch && matchesCategory
     })
 
+    // Transaction Snapshot data
+
+    const totalTransactions = expenses.length
+
+    const latestExpense =
+        expenses.length > 0
+            ? expenses.reduce(
+                (latest, expense) =>
+                    expense.date > latest.date
+                        ? expense
+                        : latest,
+                expenses[0]
+            )
+            : null
+
+    const paymentMethodTotals = expenses.reduce((totals, expense) => {
+        totals[expense.paymentMethod] =
+            (totals[expense.paymentMethod] || 0) + 1
+
+        return totals
+    }, {})
+
+    const mostUsedPaymentMethod =
+        Object.entries(paymentMethodTotals).length > 0
+            ? Object.entries(paymentMethodTotals).reduce(
+                (highest, current) =>
+                    current[1] > highest[1]
+                        ? current
+                        : highest
+            )
+            : null
+
+    const categoryTotals = expenses.reduce((totals, expense) => {
+        totals[expense.category] =
+            (totals[expense.category] || 0) + 1
+
+        return totals
+    }, {})
+
+    const mostUsedCategory =
+        Object.entries(categoryTotals).length > 0
+            ? Object.entries(categoryTotals).reduce(
+                (highest, current) =>
+                    current[1] > highest[1]
+                        ? current
+                        : highest
+            )
+            : null
+
     return (
         <div>
 
@@ -111,48 +160,207 @@ function Expenses({
                 Track, manage, and review your spending.
             </p>
 
-            {/* Expense Form */}
 
-            <div className="mt-10 max-w-2xl">
+            {/* Expense Form + Transaction Snapshot */}
 
-                {editingExpense && (
-                    <div className="mb-6">
+            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+
+                {/* Expense Form */}
+
+                <div>
+                    {editingExpense && (
+                        <div>
+                            <AddExpenseForm
+                                initialExpense={editingExpense}
+                                successMessage={successMessage}
+                                onAddExpense={(updatedExpense) => {
+                                    onUpdateExpense(updatedExpense)
+
+                                    showSuccessMessage(
+                                        'Expense updated successfully.',
+                                        () => {
+                                            setEditingExpense(null)
+                                        }
+                                    )
+                                }}
+                                submitLabel="Update Expense"
+                            />
+                        </div>
+                    )}
+
+                    {!editingExpense && (
                         <AddExpenseForm
-                            initialExpense={editingExpense}
                             successMessage={successMessage}
-                            onAddExpense={(updatedExpense) => {
-                                onUpdateExpense(updatedExpense)
+                            onAddExpense={(newExpense) => {
+                                onAddExpense(newExpense)
 
                                 showSuccessMessage(
-                                    'Expense updated successfully.',
-                                    () => {
-                                        setEditingExpense(null)
-                                    }
+                                    'Expense added successfully.'
                                 )
                             }}
-                            submitLabel="Update Expense"
                         />
+                    )}
+                </div>
+
+
+                {/* Transaction Snapshot */}
+
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
+
+                    <h3 className="text-xl font-semibold text-white">
+                        Transaction Snapshot
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-400">
+                        A quick look at your recorded transactions.
+                    </p>
+
+                    <div className="mt-6 space-y-4">
+
+                        {/* Total Transactions */}
+
+                        <div className="rounded-xl bg-gray-950 p-4">
+
+                            <div className="flex items-center justify-between">
+
+                                <div>
+                                    <p className="text-sm text-gray-500">
+                                        Transactions
+                                    </p>
+
+                                    <p className="mt-1 text-2xl font-bold text-white">
+                                        {totalTransactions}
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        Total recorded
+                                    </p>
+                                </div>
+
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-xl">
+                                    🧾
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* Latest Expense */}
+
+                        <div className="rounded-xl bg-gray-950 p-4">
+
+                            <p className="text-sm text-gray-500">
+                                Latest Expense
+                            </p>
+
+                            {latestExpense ? (
+                                <>
+                                    <p className="mt-1 font-semibold text-white">
+                                        {latestExpense.description}
+                                    </p>
+
+                                    <div className="mt-1 flex items-center justify-between gap-4">
+
+                                        <p className="text-sm text-gray-500">
+                                            {latestExpense.date}
+                                        </p>
+
+                                        <p className="text-sm font-medium text-red-400">
+                                            -₹{latestExpense.amount.toLocaleString(
+                                                'en-IN'
+                                            )}
+                                        </p>
+
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="mt-1 text-sm text-gray-500">
+                                    No expenses yet
+                                </p>
+                            )}
+
+                        </div>
+
+
+                        {/* Top Payment Method */}
+
+                        <div className="rounded-xl bg-gray-950 p-4">
+
+                            <p className="text-sm text-gray-500">
+                                Top Payment Method
+                            </p>
+
+                            {mostUsedPaymentMethod ? (
+                                <>
+                                    <p className="mt-1 text-lg font-semibold text-white">
+                                        {mostUsedPaymentMethod[0]}
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        {mostUsedPaymentMethod[1]} transaction
+                                        {mostUsedPaymentMethod[1] !== 1
+                                            ? 's'
+                                            : ''}
+                                    </p>
+                                </>
+                            ) : (
+                                <p className="mt-1 text-sm text-gray-500">
+                                    No payment data yet
+                                </p>
+                            )}
+
+                        </div>
+
+
+                        {/* Most Used Category */}
+
+                        <div className="rounded-xl bg-gray-950 p-4">
+
+                            <p className="text-sm text-gray-500">
+                                Most Used Category
+                            </p>
+
+                            {mostUsedCategory ? (
+                                <>
+                                    <div className="flex items-center gap-2">
+
+                                        <span className="text-xl">
+                                            {categories[mostUsedCategory[0]] ||
+                                                '📦'}
+                                        </span>
+
+                                        <p className="text-lg font-semibold text-white">
+                                            {mostUsedCategory[0]}
+                                        </p>
+
+                                    </div>
+
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        {mostUsedCategory[1]} transaction
+                                        {mostUsedCategory[1] !== 1
+                                            ? 's'
+                                            : ''}
+                                    </p>
+                                </>
+                            ) : (
+                                <p className="mt-1 text-sm text-gray-500">
+                                    No category data yet
+                                </p>
+                            )}
+
+                        </div>
+
                     </div>
-                )}
 
-                {!editingExpense && (
-                    <AddExpenseForm
-                        successMessage={successMessage}
-                        onAddExpense={(newExpense) => {
-                            onAddExpense(newExpense)
-
-                            showSuccessMessage(
-                                'Expense added successfully.'
-                            )
-                        }}
-                    />
-                )}
+                </div>
 
             </div>
 
+
             {/* Expenses */}
 
-            <div className="mt-8">
+            <div className="mt-6">
 
                 <h3 className="text-xl font-semibold text-white">
                     Your Expenses
@@ -161,6 +369,7 @@ function Expenses({
                 <p className="mt-1 text-sm text-gray-400">
                     Search and filter your transactions.
                 </p>
+
 
                 {/* Search & Filter */}
 
@@ -183,7 +392,9 @@ function Expenses({
                         }
                         className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     >
-                        <option value="All">All Categories</option>
+                        <option value="All">
+                            All Categories
+                        </option>
 
                         {Object.keys(categories).map((category) => (
                             <option key={category} value={category}>
@@ -194,11 +405,13 @@ function Expenses({
 
                 </div>
 
+
                 {/* Result Count */}
 
                 <p className="mt-3 text-sm text-gray-500">
                     Showing {filteredExpenses.length} expenses
                 </p>
+
 
                 {/* Expense List */}
 
@@ -257,6 +470,7 @@ function Expenses({
 
                                 </div>
 
+
                                 {/* Amount & Actions */}
 
                                 <div className="flex items-center gap-2 sm:justify-end">
@@ -284,70 +498,7 @@ function Expenses({
                                     </button>
 
                                 </div>
-                                {expenseToDelete && (
-                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-sm">
-                                        <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
 
-                                            {/* Icon */}
-
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-2xl">
-                                                ⚠️
-                                            </div>
-
-                                            {/* Content */}
-
-                                            <h3 className="mt-4 text-xl font-semibold text-white">
-                                                Delete Expense?
-                                            </h3>
-
-                                            <p className="mt-2 text-sm leading-6 text-gray-400">
-                                                This action cannot be undone. Are you sure you want to
-                                                permanently delete this expense?
-                                            </p>
-
-                                            {/* Expense */}
-
-                                            <div className="mt-4 rounded-xl border border-gray-800 bg-gray-950 p-4">
-                                                <p className="font-medium text-white">
-                                                    {expenseToDelete.description}
-                                                </p>
-
-                                                <div className="mt-1 flex items-center justify-between">
-                                                    <p className="text-sm text-gray-500">
-                                                        {expenseToDelete.category}
-                                                    </p>
-
-                                                    <p className="font-semibold text-red-400">
-                                                        -₹{expenseToDelete.amount.toLocaleString('en-IN')}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Actions */}
-
-                                            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setExpenseToDelete(null)}
-                                                    className="rounded-lg border border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800"
-                                                >
-                                                    Cancel
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={confirmDelete}
-                                                    className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
-                                                >
-                                                    Delete Expense
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
                         ))
@@ -355,6 +506,85 @@ function Expenses({
 
                 </div>
             </div>
+
+
+            {/* Delete Confirmation Modal */}
+
+            {expenseToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-sm">
+
+                    <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
+
+                        {/* Icon */}
+
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-2xl">
+                            ⚠️
+                        </div>
+
+
+                        {/* Content */}
+
+                        <h3 className="mt-4 text-xl font-semibold text-white">
+                            Delete Expense?
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-gray-400">
+                            This action cannot be undone. Are you sure you want
+                            to permanently delete this expense?
+                        </p>
+
+
+                        {/* Expense */}
+
+                        <div className="mt-4 rounded-xl border border-gray-800 bg-gray-950 p-4">
+
+                            <p className="font-medium text-white">
+                                {expenseToDelete.description}
+                            </p>
+
+                            <div className="mt-1 flex items-center justify-between">
+
+                                <p className="text-sm text-gray-500">
+                                    {expenseToDelete.category}
+                                </p>
+
+                                <p className="font-semibold text-red-400">
+                                    -₹{expenseToDelete.amount.toLocaleString(
+                                        'en-IN'
+                                    )}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* Actions */}
+
+                        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+                            <button
+                                type="button"
+                                onClick={() => setExpenseToDelete(null)}
+                                className="rounded-lg border border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={confirmDelete}
+                                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
+                            >
+                                Delete Expense
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
 
         </div>
     )

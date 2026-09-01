@@ -68,7 +68,7 @@ function Analytics({ expenses }) {
         }))
 
     return (
-        <div className="space-y-8">
+        <div>
             <p className="text-sm font-medium text-indigo-400">
                 Financial Insights
             </p>
