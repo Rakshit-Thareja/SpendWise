@@ -4,12 +4,11 @@ import Footer from '../components/footer'
 import { useState } from 'react'
 
 function DashboardLayout({ children }) {
-
     const [menuOpen, setMenuOpen] = useState(false)
 
     return (
         <div className="min-h-screen bg-gray-950 text-white">
-            
+
             <Navbar
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
@@ -25,7 +24,8 @@ function DashboardLayout({ children }) {
                     {children}
                 </main>
             </div>
-            <Footer/>
+
+            <Footer />
         </div>
     )
 }

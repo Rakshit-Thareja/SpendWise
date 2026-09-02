@@ -1,19 +1,27 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import LogoutButton from './LogoutButton'
 
 function Sidebar({ menuOpen, setMenuOpen }) {
+
+    const location = useLocation()
+
     const links = [
         { name: 'Dashboard', path: '/', icon: '🏠' },
         { name: 'Expenses', path: '/expenses', icon: '💸' },
         { name: 'Budget', path: '/budget', icon: '🎯' },
         { name: 'Analytics', path: '/analytics', icon: '📊' },
-        {name: 'Currency Converter', path: '/currency-converter', icon: '💱',},
+        {
+            name: 'Currency Converter',
+            path: '/currency-converter',
+            icon: '💱',
+        },
         { name: 'Settings', path: '/settings', icon: '⚙️' },
     ]
 
     return (
         <aside
-            className={`w-full border-b border-gray-800 bg-gray-950 p-3 sm:min-h-[calc(100vh-4rem)] sm:w-60 sm:border-b-0 sm:border-r ${menuOpen ? 'block' : 'hidden'
-                } sm:block`}
+            className={`w-full border-b border-gray-800 bg-gray-950 p-3 sm:h-full sm:w-60 sm:border-b-0 sm:border-r ${menuOpen ? 'block' : 'hidden'
+                } sm:flex sm:flex-col`}
         >
             <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:gap-1">
                 {links.map((link) => (
@@ -38,6 +46,12 @@ function Sidebar({ menuOpen, setMenuOpen }) {
                     </NavLink>
                 ))}
             </nav>
+
+            {location.pathname === '/settings' && (
+                <div className="mt-4 border-t border-gray-800 pt-4">
+                    <LogoutButton />
+                </div>
+            )}
         </aside>
     )
 }
