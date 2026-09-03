@@ -14,6 +14,11 @@ function Expenses({
     const [searchTerm, setSearchTerm] = useState('')
     const [categoryFilter, setCategoryFilter] = useState('All')
 
+    const [errorMessage, setErrorMessage] = useState('')
+
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
+
     const successTimeoutRef = useRef(null)
 
     const [expenseToDelete, setExpenseToDelete] = useState(null)
@@ -36,11 +41,27 @@ function Expenses({
         }
     }, [expenseToDelete])
 
-    const confirmDelete = () => {
-        if (expenseToDelete) {
-            onDeleteExpense(expenseToDelete.id)
+    const confirmDelete = async () => {
+        if (!expenseToDelete || isDeleting) {
+            return
+        }
+
+        setErrorMessage('')
+        setIsDeleting(true)
+
+        try {
+            await onDeleteExpense(expenseToDelete.id)
+
             showSuccessMessage('Expense deleted successfully.')
             setExpenseToDelete(null)
+        } catch (error) {
+            console.error('Failed to delete expense:', error)
+
+            setErrorMessage(
+                'Failed to delete the expense. Please try again.'
+            )
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -160,6 +181,11 @@ function Expenses({
                 Track, manage, and review your spending.
             </p>
 
+            {errorMessage && (
+                <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                    {errorMessage}
+                </div>
+            )}
 
             {/* Expense Form + Transaction Snapshot */}
 
@@ -173,15 +199,35 @@ function Expenses({
                             <AddExpenseForm
                                 initialExpense={editingExpense}
                                 successMessage={successMessage}
-                                onAddExpense={(updatedExpense) => {
-                                    onUpdateExpense(updatedExpense)
+                                onAddExpense={async (updatedExpense) => {
+                                    if (isSubmitting) {
+                                        return
+                                    }
 
-                                    showSuccessMessage(
-                                        'Expense updated successfully.',
-                                        () => {
-                                            setEditingExpense(null)
-                                        }
-                                    )
+                                    setErrorMessage('')
+                                    setIsSubmitting(true)
+
+                                    try {
+                                        await onUpdateExpense(updatedExpense)
+
+                                        showSuccessMessage(
+                                            'Expense updated successfully.',
+                                            () => {
+                                                setEditingExpense(null)
+                                            }
+                                        )
+                                    } catch (error) {
+                                        console.error(
+                                            'Failed to update expense:',
+                                            error
+                                        )
+
+                                        setErrorMessage(
+                                            'Failed to update the expense. Please try again.'
+                                        )
+                                    } finally {
+                                        setIsSubmitting(false)
+                                    }
                                 }}
                                 submitLabel="Update Expense"
                             />
@@ -191,12 +237,32 @@ function Expenses({
                     {!editingExpense && (
                         <AddExpenseForm
                             successMessage={successMessage}
-                            onAddExpense={(newExpense) => {
-                                onAddExpense(newExpense)
+                            onAddExpense={async (newExpense) => {
+                                if (isSubmitting) {
+                                    return
+                                }
 
-                                showSuccessMessage(
-                                    'Expense added successfully.'
-                                )
+                                setErrorMessage('')
+                                setIsSubmitting(true)
+
+                                try {
+                                    await onAddExpense(newExpense)
+
+                                    showSuccessMessage(
+                                        'Expense added successfully.'
+                                    )
+                                } catch (error) {
+                                    console.error(
+                                        'Failed to add expense:',
+                                        error
+                                    )
+
+                                    setErrorMessage(
+                                        'Failed to add the expense. Please try again.'
+                                    )
+                                } finally {
+                                    setIsSubmitting(false)
+                                }
                             }}
                         />
                     )}
@@ -574,9 +640,12 @@ function Expenses({
                             <button
                                 type="button"
                                 onClick={confirmDelete}
-                                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500"
+                                disabled={isDeleting}
+                                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Delete Expense
+                                {isDeleting
+                                    ? 'Deleting...'
+                                    : 'Delete Expense'}
                             </button>
 
                         </div>

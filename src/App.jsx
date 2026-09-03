@@ -339,6 +339,8 @@ function App() {
         'Failed to add expense to Firestore',
         error
       )
+
+      throw error
     }
   }
 
@@ -364,6 +366,8 @@ function App() {
         'Failed to delete expense from Firestore',
         error
       )
+
+      throw error
     }
   }
 
@@ -394,6 +398,8 @@ function App() {
         'Failed to update expense in Firestore',
         error
       )
+
+      throw error
     }
   }
 

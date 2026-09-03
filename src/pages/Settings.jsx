@@ -1,6 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Button from '../components/Button'
+import LogoutButton from '../components/LogoutButton'
+import { useAuth } from '../context/AuthContext'
+import { saveUserData } from '../firebase/firestore'
 
 function Settings({
     expenses,
@@ -9,12 +12,80 @@ function Settings({
     onResetData,
     onRestoreData,
 }) {
+    const { user, displayName, updateUserDisplayName } = useAuth()
+
+    const [name, setName] = useState(displayName || user?.displayName || '')
+    const [nameMessage, setNameMessage] = useState({
+        text: '',
+        type: '',
+    })
+    const [savingName, setSavingName] = useState(false)
+
     const [importMessage, setImportMessage] = useState({
         text: '',
         type: '',
     })
 
     const [showResetConfirm, setShowResetConfirm] = useState(false)
+
+    useEffect(() => {
+        setName(displayName || user?.displayName || '')
+    }, [displayName, user])
+
+    const handleSaveName = async (event) => {
+        event.preventDefault()
+
+        const trimmedName = name.trim()
+
+        if (!trimmedName) {
+            setNameMessage({
+                text: 'Please enter your name.',
+                type: 'error',
+            })
+            return
+        }
+
+        if (!user) {
+            return
+        }
+
+        setSavingName(true)
+        setNameMessage({
+            text: '',
+            type: '',
+        })
+
+        try {
+            await updateUserDisplayName(trimmedName)
+
+            await saveUserData(user.uid, {
+                displayName: trimmedName,
+            })
+
+            setName(trimmedName)
+
+            setNameMessage({
+                text: 'Name updated successfully.',
+                type: 'success',
+            })
+
+            setTimeout(() => {
+                setNameMessage({
+                    text: '',
+                    type: '',
+                })
+            }, 3000)
+        } catch (error) {
+            console.error('Failed to update name:', error)
+
+            setNameMessage({
+                text: 'Failed to update your name. Please try again.',
+                type: 'error',
+            })
+        } finally {
+            setSavingName(false)
+        }
+    }
 
     const handleExport = () => {
         const backupData = {
@@ -60,17 +131,14 @@ function Settings({
             try {
                 const backupData = JSON.parse(event.target.result)
 
-                // Validate expenses
                 if (!Array.isArray(backupData.expenses)) {
                     throw new Error('Invalid expenses data')
                 }
 
-                // Validate income
                 if (!Number.isFinite(backupData.income)) {
                     throw new Error('Invalid income data')
                 }
 
-                // Validate budgets
                 if (
                     backupData.budgets === null ||
                     typeof backupData.budgets !== 'object' ||
@@ -79,7 +147,6 @@ function Settings({
                     throw new Error('Invalid budget data')
                 }
 
-                // Restore the backup
                 onRestoreData(backupData)
 
                 setImportMessage({
@@ -87,7 +154,6 @@ function Settings({
                     type: 'success',
                 })
 
-                // Hide success message after 3 seconds
                 setTimeout(() => {
                     setImportMessage({
                         text: '',
@@ -112,14 +178,11 @@ function Settings({
         }
 
         reader.readAsText(file)
-
-        // Allows the same file to be selected again
         event.target.value = ''
     }
 
     return (
         <div>
-
             {/* Header */}
 
             <p className="text-sm font-medium text-indigo-400">
@@ -134,11 +197,65 @@ function Settings({
                 Manage your SpendWise preferences and data.
             </p>
 
+            {/* Profile */}
+
+            <div className="mt-10 max-w-2xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
+                <h3 className="text-xl font-semibold text-white">
+                    👤 Profile
+                </h3>
+
+                <p className="mt-2 text-sm leading-6 text-gray-400">
+                    Update the name shown in SpendWise.
+                </p>
+
+                <form
+                    onSubmit={handleSaveName}
+                    className="mt-6"
+                >
+                    <label
+                        htmlFor="displayName"
+                        className="block text-sm font-medium text-gray-300"
+                    >
+                        Your Name
+                    </label>
+
+                    <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                        <input
+                            id="displayName"
+                            type="text"
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                            placeholder="Enter your name"
+                            maxLength={50}
+                            className="flex-1 rounded-lg border border-gray-700 bg-gray-950 px-4 py-3 text-white outline-none focus:border-indigo-500"
+                        />
+
+                        <Button
+                            type="submit"
+                            disabled={savingName}
+                        >
+                            {savingName ? 'Saving...' : 'Save Name'}
+                        </Button>
+                    </div>
+
+                    {nameMessage.text && (
+                        <p
+                            className={`mt-3 text-sm ${
+                                nameMessage.type === 'success'
+                                    ? 'text-green-400'
+                                    : 'text-red-400'
+                            }`}
+                        >
+                            {nameMessage.type === 'success' ? '✅' : '⚠️'}{' '}
+                            {nameMessage.text}
+                        </p>
+                    )}
+                </form>
+            </div>
 
             {/* Data Management */}
 
-            <div className="mt-10 max-w-2xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
-
+            <div className="mt-6 max-w-2xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
                 <h3 className="text-xl font-semibold text-white">
                     🗄️ Data Management
                 </h3>
@@ -147,11 +264,7 @@ function Settings({
                     Your SpendWise data is stored locally in this browser.
                 </p>
 
-
-                {/* Data Summary */}
-
                 <div className="mt-6 space-y-4">
-
                     <div className="flex items-center justify-between rounded-lg bg-gray-950 px-4 py-3">
                         <span className="text-sm text-gray-400">
                             Expenses
@@ -171,16 +284,10 @@ function Settings({
                             ₹{income.toLocaleString('en-IN')}
                         </span>
                     </div>
-
                 </div>
 
-
-                {/* Import / Export */}
-
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-
                     <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-700 px-4 py-3 font-semibold text-gray-200 transition hover:bg-gray-800">
-
                         Import Data
 
                         <input
@@ -189,7 +296,6 @@ function Settings({
                             onChange={handleImport}
                             className="hidden"
                         />
-
                     </label>
 
                     <Button
@@ -198,28 +304,20 @@ function Settings({
                     >
                         Export Data
                     </Button>
-
                 </div>
-
-
-                {/* Import Message */}
 
                 {importMessage.text && (
                     <p
-                        className={`mt-3 text-sm ${importMessage.type === 'success'
-                            ? 'text-green-400'
-                            : 'text-red-400'
-                            }`}
+                        className={`mt-3 text-sm ${
+                            importMessage.type === 'success'
+                                ? 'text-green-400'
+                                : 'text-red-400'
+                        }`}
                     >
-                        {importMessage.type === 'success'
-                            ? '✅'
-                            : '⚠️'}{' '}
+                        {importMessage.type === 'success' ? '✅' : '⚠️'}{' '}
                         {importMessage.text}
                     </p>
                 )}
-
-
-                {/* Reset */}
 
                 <Button
                     variant="danger"
@@ -228,17 +326,29 @@ function Settings({
                 >
                     Reset All Data
                 </Button>
-
             </div>
 
+            {/* Account */}
+
+            <div className="mt-6 max-w-2xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
+                <h3 className="text-xl font-semibold text-white">
+                    🔐 Account
+                </h3>
+
+                <p className="mt-2 text-sm leading-6 text-gray-400">
+                    Sign out of your SpendWise account from here.
+                </p>
+
+                <div className="mt-6 max-w-xs">
+                    <LogoutButton />
+                </div>
+            </div>
 
             {/* Reset Confirmation Modal */}
 
             {showResetConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-
                     <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl">
-
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-2xl">
                             ⚠️
                         </div>
@@ -253,7 +363,6 @@ function Settings({
                         </p>
 
                         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-
                             <Button
                                 variant="secondary"
                                 onClick={() => setShowResetConfirm(false)}
@@ -270,14 +379,10 @@ function Settings({
                             >
                                 Reset Data
                             </Button>
-
                         </div>
-
                     </div>
-
                 </div>
             )}
-
         </div>
     )
 }

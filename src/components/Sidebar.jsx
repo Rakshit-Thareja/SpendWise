@@ -1,10 +1,6 @@
-import { NavLink, useLocation } from 'react-router-dom'
-import LogoutButton from './LogoutButton'
+import { NavLink } from 'react-router-dom'
 
 function Sidebar({ menuOpen, setMenuOpen }) {
-
-    const location = useLocation()
-
     const links = [
         { name: 'Dashboard', path: '/', icon: '🏠' },
         { name: 'Expenses', path: '/expenses', icon: '💸' },
@@ -20,8 +16,9 @@ function Sidebar({ menuOpen, setMenuOpen }) {
 
     return (
         <aside
-            className={`w-full border-b border-gray-800 bg-gray-950 p-3 sm:h-full sm:w-60 sm:border-b-0 sm:border-r ${menuOpen ? 'block' : 'hidden'
-                } sm:flex sm:flex-col`}
+            className={`w-full border-b border-gray-800 bg-gray-950 p-3 sm:h-full sm:w-60 sm:border-b-0 sm:border-r ${
+                menuOpen ? 'block' : 'hidden'
+            } sm:flex sm:flex-col`}
         >
             <nav className="flex gap-2 overflow-x-auto sm:flex-col sm:gap-1">
                 {links.map((link) => (
@@ -30,9 +27,10 @@ function Sidebar({ menuOpen, setMenuOpen }) {
                         key={link.path}
                         to={link.path}
                         className={({ isActive }) =>
-                            `flex shrink-0 items-center rounded-lg px-4 py-3 text-sm transition ${isActive
-                                ? 'bg-indigo-600 text-white shadow-sm'
-                                : 'text-gray-400 hover:bg-gray-900 hover:text-white'
+                            `flex shrink-0 items-center rounded-lg px-4 py-3 text-sm transition ${
+                                isActive
+                                    ? 'bg-indigo-600 text-white shadow-sm'
+                                    : 'text-gray-400 hover:bg-gray-900 hover:text-white'
                             }`
                         }
                     >
@@ -46,12 +44,6 @@ function Sidebar({ menuOpen, setMenuOpen }) {
                     </NavLink>
                 ))}
             </nav>
-
-            {location.pathname === '/settings' && (
-                <div className="mt-4 border-t border-gray-800 pt-4">
-                    <LogoutButton />
-                </div>
-            )}
         </aside>
     )
 }
