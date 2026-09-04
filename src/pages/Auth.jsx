@@ -56,8 +56,15 @@ function Auth() {
                 setError('Password should be at least 6 characters.')
             } else if (error.code === 'auth/invalid-email') {
                 setError('Please enter a valid email address.')
+            } else if (error.code === 'auth/operation-not-allowed') {
+                setError('Email/password sign-in is not enabled for this project.')
+            } else if (error.code === 'auth/too-many-requests') {
+                setError('Too many attempts. Please wait a few minutes before trying again.')
+            } else if (error.code === 'auth/network-request-failed') {
+                setError('Network error. Please check your connection and try again.')
             } else {
-                setError('Something went wrong. Please try again.')
+                console.error('Firebase authentication failed:', error)
+                setError('Authentication failed. Please try again in a moment.')
             }
         } finally {
             setLoading(false)
