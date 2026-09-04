@@ -38,7 +38,7 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
       # GitHub Pages otherwise returns its default 404 page for a refreshed
-      # client-side route such as /spendwise/expenses.
+      # client-side route such as /SpendWise/expenses.
       - name: Add SPA fallback
         run: cp dist/index.html dist/404.html
 
