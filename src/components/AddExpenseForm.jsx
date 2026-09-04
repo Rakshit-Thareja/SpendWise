@@ -53,7 +53,7 @@ function AddExpenseForm({
         setError('')
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
         if (saving) {
@@ -88,7 +88,14 @@ function AddExpenseForm({
             description: formData.description.trim(),
         }
 
-        onAddExpense(newExpense)
+        try {
+            await onAddExpense(newExpense)
+        } catch {
+            setError('Unable to save this expense. Please try again.')
+            return
+        } finally {
+            setSaving(false)
+        }
 
         // Only reset the form when adding a NEW expense.
         // When editing, keep the updated values visible
@@ -103,7 +110,6 @@ function AddExpenseForm({
             })
         }
 
-        setSaving(false)
     }
 
     return (

@@ -227,7 +227,7 @@ function App() {
             const migratedExpenses = []
 
             for (const expense of localExpenses) {
-              const { id, ...expenseData } =
+              const { id: _id, ...expenseData } =
                 expense
 
               const savedExpense =
@@ -322,7 +322,7 @@ function App() {
     }
 
     try {
-      const { id, ...expenseData } = expense
+      const { id: _id, ...expenseData } = expense
 
       const savedExpense =
         await addExpenseToFirestore(
@@ -377,7 +377,7 @@ function App() {
     }
 
     try {
-      const { id, ...expenseData } =
+      const { id: _id, ...expenseData } =
         updatedExpense
 
       await updateExpenseInFirestore(
@@ -448,7 +448,7 @@ function App() {
       const restoredExpenses = []
 
       for (const expense of backupData.expenses) {
-        const { id, ...expenseData } = expense
+        const { id: _id, ...expenseData } = expense
 
         const savedExpense =
           await addExpenseToFirestore(
@@ -498,6 +498,8 @@ function App() {
         'Failed to restore backup data',
         error
       )
+
+      throw error
     }
   }
 
@@ -507,10 +509,20 @@ function App() {
     }
 
     try {
+      // Demo data is a replacement set. Clear remote records first so they
+      // do not reappear after a later reload.
+      const existingExpenses = await getExpenses(user.uid)
+
+      await Promise.all(
+        existingExpenses.map((expense) =>
+          deleteExpenseFromFirestore(user.uid, expense.id)
+        )
+      )
+
       const savedDemoExpenses = []
 
       for (const expense of demoExpenses) {
-        const { id, ...expenseData } =
+        const { id: _id, ...expenseData } =
           expense
 
         const savedExpense =
@@ -660,13 +672,13 @@ function App() {
                 expenses={expenses}
                 income={income}
                 budgets={budgets}
-                onResetData={() => {
-                  setExpenses([])
-                  setIncome(50000)
-                  setBudgets(
-                    defaultBudgets
-                  )
-                }}
+                onResetData={() =>
+                  restoreData({
+                    expenses: [],
+                    income: 50000,
+                    budgets: defaultBudgets,
+                  })
+                }
                 onRestoreData={
                   restoreData
                 }

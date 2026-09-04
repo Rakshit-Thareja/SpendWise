@@ -27,6 +27,7 @@ function Settings({
     })
 
     const [showResetConfirm, setShowResetConfirm] = useState(false)
+    const [resetting, setResetting] = useState(false)
 
     useEffect(() => {
         setName(displayName || user?.displayName || '')
@@ -113,6 +114,27 @@ function Settings({
         URL.revokeObjectURL(url)
     }
 
+    const handleReset = async () => {
+        if (resetting) {
+            return
+        }
+
+        setResetting(true)
+
+        try {
+            await onResetData()
+            setShowResetConfirm(false)
+        } catch (error) {
+            console.error('Failed to reset data:', error)
+            setImportMessage({
+                text: 'Failed to reset data. Please try again.',
+                type: 'error',
+            })
+        } finally {
+            setResetting(false)
+        }
+    }
+
     const handleImport = (event) => {
         setImportMessage({
             text: '',
@@ -127,7 +149,7 @@ function Settings({
 
         const reader = new FileReader()
 
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
                 const backupData = JSON.parse(event.target.result)
 
@@ -147,7 +169,7 @@ function Settings({
                     throw new Error('Invalid budget data')
                 }
 
-                onRestoreData(backupData)
+                await onRestoreData(backupData)
 
                 setImportMessage({
                     text: 'Data imported successfully.',
@@ -261,7 +283,8 @@ function Settings({
                 </h3>
 
                 <p className="mt-2 text-sm leading-6 text-gray-400">
-                    Your SpendWise data is stored locally in this browser.
+                    Your SpendWise data is securely synced to your account and
+                    can also be exported as a local backup.
                 </p>
 
                 <div className="mt-6 space-y-4">
@@ -372,12 +395,10 @@ function Settings({
 
                             <Button
                                 variant="danger"
-                                onClick={() => {
-                                    onResetData()
-                                    setShowResetConfirm(false)
-                                }}
+                                onClick={handleReset}
+                                disabled={resetting}
                             >
-                                Reset Data
+                                {resetting ? 'Resetting...' : 'Reset Data'}
                             </Button>
                         </div>
                     </div>

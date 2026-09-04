@@ -225,6 +225,7 @@ function Expenses({
                                         setErrorMessage(
                                             'Failed to update the expense. Please try again.'
                                         )
+                                        throw error
                                     } finally {
                                         setIsSubmitting(false)
                                     }
@@ -260,6 +261,7 @@ function Expenses({
                                     setErrorMessage(
                                         'Failed to add the expense. Please try again.'
                                     )
+                                    throw error
                                 } finally {
                                     setIsSubmitting(false)
                                 }

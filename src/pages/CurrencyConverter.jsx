@@ -34,7 +34,7 @@ function CurrencyConverter() {
                 const data = await response.json()
 
                 setCurrencies(data)
-            } catch (error) {
+            } catch {
                 setError('Failed to load currencies')
             }
         }
@@ -67,7 +67,7 @@ function CurrencyConverter() {
             const data = await response.json()
 
             setRate(data.rate)
-        } catch (error) {
+        } catch {
             setError('Failed to fetch exchange rate')
         } finally {
             setLoading(false)
