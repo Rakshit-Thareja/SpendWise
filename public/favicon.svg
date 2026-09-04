@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="spendwiseGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="16" fill="#0F172A" />
+  <!-- Prominent "S" Curve -->
+  <path d="M 42 21 C 42 14, 22 14, 22 25 C 22 36, 42 32, 42 43 C 42 53, 22 52, 20 46" 
+        stroke="url(#spendwiseGrad)" stroke-width="7" stroke-linecap="round" fill="none" />
+  <!-- Growth Trend Arrow Header -->
+  <path d="M 33 13 L 45 13 L 45 25" 
+        stroke="url(#spendwiseGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>
