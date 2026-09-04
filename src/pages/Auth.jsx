@@ -64,7 +64,9 @@ function Auth() {
                 setError('Network error. Please check your connection and try again.')
             } else {
                 console.error('Firebase authentication failed:', error)
-                setError('Authentication failed. Please try again in a moment.')
+                setError(
+                    `Authentication failed (${error.code || 'unknown error'}). Please try again.`
+                )
             }
         } finally {
             setLoading(false)
