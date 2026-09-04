@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
-import Footer from '../components/footer'
+import Footer from '../components/Footer'
 import { useState } from 'react'
 
 function DashboardLayout({ children }) {
