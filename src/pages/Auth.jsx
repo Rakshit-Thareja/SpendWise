@@ -62,6 +62,10 @@ function Auth() {
                 setError('Too many attempts. Please wait a few minutes before trying again.')
             } else if (error.code === 'auth/network-request-failed') {
                 setError('Network error. Please check your connection and try again.')
+            } else if (String(error.code || '').includes('api-key-not-valid')) {
+                setError(
+                    'Firebase API key is invalid. Remove quotes/spaces from VITE_FIREBASE_API_KEY and the GitHub API secret, then redeploy.'
+                )
             } else {
                 console.error('Firebase authentication failed:', error)
                 setError(

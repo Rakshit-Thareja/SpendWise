@@ -115,36 +115,28 @@ const getStoredNumber = (key, fallback) => {
 function App() {
   const { user } = useAuth()
 
-  const [expenses, setExpenses] = useState(() =>
-    getStoredData(
-      'spendwise-expenses',
-      [],
-      Array.isArray
-    )
-  )
+  const [expenses, setExpenses] = useState([])
 
-  const [income, setIncome] = useState(() =>
-    getStoredNumber(
-      'spendwise-income',
-      50000
-    )
-  )
+  const [income, setIncome] = useState(50000)
 
-  const [budgets, setBudgets] = useState(() =>
-    getStoredData(
-      'spendwise-budgets',
-      defaultBudgets,
-      (data) =>
-        data !== null &&
-        typeof data === 'object' &&
-        !Array.isArray(data)
-    )
-  )
+  const [budgets, setBudgets] = useState(defaultBudgets)
 
-  const [dataLoading, setDataLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true)
+  const [loadedUserId, setLoadedUserId] = useState(null)
+
+  const getUserCacheKey = (userId, key) =>
+    `spendwise-${userId}-${key}`
 
   useEffect(() => {
+    let cancelled = false
+
+    setLoadedUserId(null)
+
     if (!user) {
+      setExpenses([])
+      setIncome(50000)
+      setBudgets(defaultBudgets)
+      setDataLoading(false)
       return
     }
 
@@ -158,131 +150,105 @@ function App() {
             getExpenses(user.uid),
           ])
 
-        /*
-         * If the Firebase user already has data,
-         * Firebase becomes the source of truth.
-         */
-        if (userData) {
-          if (
-            Number.isFinite(
-              Number(userData.income)
-            )
-          ) {
-            setIncome(
-              Number(userData.income)
-            )
-          }
-
-          if (
-            userData.budgets &&
-            typeof userData.budgets === 'object' &&
-            !Array.isArray(userData.budgets)
-          ) {
-            setBudgets(userData.budgets)
-          }
-        } else {
-          /*
-           * First-time Firebase user.
-           *
-           * Use the existing localStorage data
-           * as the starting point and save it
-           * to Firebase.
-           */
-          const localExpenses =
-            getStoredData(
-              'spendwise-expenses',
-              [],
-              Array.isArray
-            )
-
-          const localIncome =
-            getStoredNumber(
-              'spendwise-income',
-              50000
-            )
-
-          const localBudgets =
-            getStoredData(
-              'spendwise-budgets',
-              defaultBudgets,
-              (data) =>
-                data !== null &&
-                typeof data === 'object' &&
-                !Array.isArray(data)
-            )
-
-          setExpenses(localExpenses)
-          setIncome(localIncome)
-          setBudgets(localBudgets)
-
-          await saveUserData(user.uid, {
-            income: localIncome,
-            budgets: localBudgets,
-          })
-
-          /*
-           * Migrate local expenses into Firestore.
-           */
-          if (localExpenses.length > 0) {
-            const migratedExpenses = []
-
-            for (const expense of localExpenses) {
-              const { id: _id, ...expenseData } =
-                expense
-
-              const savedExpense =
-                await addExpenseToFirestore(
-                  user.uid,
-                  expenseData
-                )
-
-              migratedExpenses.push(
-                savedExpense
-              )
-            }
-
-            setExpenses(migratedExpenses)
-          }
-
+        if (cancelled) {
           return
         }
 
-        /*
-         * Existing Firebase user:
-         * use Firestore expenses.
-         */
-        setExpenses(firestoreExpenses)
-      } catch (error) {
-        console.error(
-          'Failed to load SpendWise data',
-          error
+        // Firebase is the source of truth. For older accounts that were
+        // created before the migration was completed, use only that user's
+        // own browser cache as a fallback and then save it to Firebase.
+        const cachedIncome = getStoredNumber(
+          getUserCacheKey(user.uid, 'income'),
+          50000
         )
+
+        const cachedBudgets = getStoredData(
+          getUserCacheKey(user.uid, 'budgets'),
+          defaultBudgets,
+          (data) =>
+            data !== null &&
+            typeof data === 'object' &&
+            !Array.isArray(data)
+        )
+
+        const hasUserIncome =
+          userData &&
+          Number.isFinite(Number(userData.income))
+
+        const hasUserBudgets =
+          userData &&
+          userData.budgets &&
+          typeof userData.budgets === 'object' &&
+          !Array.isArray(userData.budgets)
+
+        const loadedIncome =
+          hasUserIncome ? Number(userData.income) : cachedIncome
+
+        const loadedBudgets =
+          hasUserBudgets ? userData.budgets : cachedBudgets
+
+        setIncome(loadedIncome)
+        setBudgets(loadedBudgets)
+        setExpenses(firestoreExpenses)
+
+        // Create missing account fields without overwriting values that
+        // already exist for the signed-in user.
+        const dataToSave = {}
+
+        if (!hasUserIncome) {
+          dataToSave.income = loadedIncome
+        }
+
+        if (!hasUserBudgets) {
+          dataToSave.budgets = loadedBudgets
+        }
+
+        if (Object.keys(dataToSave).length > 0) {
+          await saveUserData(user.uid, dataToSave)
+        }
+
+        if (!cancelled) {
+          setLoadedUserId(user.uid)
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error(
+            'Failed to load SpendWise data',
+            error
+          )
+        }
       } finally {
-        setDataLoading(false)
+        if (!cancelled) {
+          setDataLoading(false)
+        }
       }
     }
 
     loadUserData()
+
+    return () => {
+      cancelled = true
+    }
   }, [user])
 
   useEffect(() => {
-    if (!user || dataLoading) {
+    if (!user || dataLoading || loadedUserId !== user.uid) {
       return
     }
 
     localStorage.setItem(
-      'spendwise-expenses',
+      getUserCacheKey(user.uid, 'expenses'),
       JSON.stringify(expenses)
     )
-  }, [expenses, user, dataLoading])
+  }, [expenses, user, dataLoading, loadedUserId])
 
   useEffect(() => {
-    if (!user || dataLoading) {
+    if (!user || dataLoading || loadedUserId !== user.uid) {
       return
     }
 
     localStorage.setItem(
-      'spendwise-income',
+      getUserCacheKey(user.uid, 'income'),
       income.toString()
     )
 
@@ -294,15 +260,15 @@ function App() {
         error
       )
     })
-  }, [income, user, dataLoading])
+  }, [income, user, dataLoading, loadedUserId])
 
   useEffect(() => {
-    if (!user || dataLoading) {
+    if (!user || dataLoading || loadedUserId !== user.uid) {
       return
     }
 
     localStorage.setItem(
-      'spendwise-budgets',
+      getUserCacheKey(user.uid, 'budgets'),
       JSON.stringify(budgets)
     )
 
@@ -314,7 +280,7 @@ function App() {
         error
       )
     })
-  }, [budgets, user, dataLoading])
+  }, [budgets, user, dataLoading, loadedUserId])
 
   const addExpense = async (expense) => {
     if (!user) {
@@ -377,7 +343,7 @@ function App() {
     }
 
     try {
-      const { id: _id, ...expenseData } =
+      const { id, ...expenseData } =
         updatedExpense
 
       await updateExpenseInFirestore(
@@ -478,17 +444,17 @@ function App() {
        * Keep localStorage backup in sync
        */
       localStorage.setItem(
-        'spendwise-expenses',
+        getUserCacheKey(user.uid, 'expenses'),
         JSON.stringify(restoredExpenses)
       )
 
       localStorage.setItem(
-        'spendwise-income',
+        getUserCacheKey(user.uid, 'income'),
         backupData.income.toString()
       )
 
       localStorage.setItem(
-        'spendwise-budgets',
+        getUserCacheKey(user.uid, 'budgets'),
         JSON.stringify(
           backupData.budgets
         )
@@ -564,7 +530,7 @@ function App() {
     }
   }
 
-  if (dataLoading) {
+  if (user && dataLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950">
         <p className="text-gray-400">
