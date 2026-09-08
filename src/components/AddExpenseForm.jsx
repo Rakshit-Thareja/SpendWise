@@ -62,18 +62,56 @@ function AddExpenseForm({
 
         setError('')
 
-        if (!formData.amount || Number(formData.amount) <= 0) {
-            setError('Please enter a valid amount.')
+        const amount = Number(formData.amount)
+        const description = formData.description.trim()
+
+        if (!formData.amount || !Number.isFinite(amount) || amount <= 0) {
+            setError('Please enter an amount greater than ₹0.')
             return
         }
 
-        if (!formData.description.trim()) {
+        if (amount > 10000000) {
+            setError('Amount cannot exceed ₹1,00,00,000.')
+            return
+        }
+
+        if (!description) {
             setError('Please add a description.')
+            return
+        }
+
+        if (description.length < 2) {
+            setError('Description must contain at least 2 characters.')
+            return
+        }
+
+        if (description.length > 100) {
+            setError('Description cannot exceed 100 characters.')
+            return
+        }
+
+        if (!formData.category || !categories[formData.category]) {
+            setError('Please select a valid category.')
             return
         }
 
         if (!formData.date) {
             setError('Please select a date.')
+            return
+        }
+
+        const selectedDate = new Date(`${formData.date}T00:00:00`)
+        const today = new Date()
+
+        today.setHours(23, 59, 59, 999)
+
+        if (Number.isNaN(selectedDate.getTime())) {
+            setError('Please select a valid date.')
+            return
+        }
+
+        if (selectedDate > today) {
+            setError('Expense date cannot be in the future.')
             return
         }
 
@@ -84,8 +122,8 @@ function AddExpenseForm({
             id: initialExpense
                 ? initialExpense.id
                 : Date.now(),
-            amount: Number(formData.amount),
-            description: formData.description.trim(),
+            amount,
+            description,
         }
 
         try {
