@@ -5,13 +5,21 @@ function Navbar({ menuOpen, setMenuOpen }) {
     const { user, displayName } = useAuth()
     const navigate = useNavigate()
 
-    const name = displayName || user?.displayName || 'User'
+    // Default name = part of email before "@"
+    const emailName = user?.email
+        ? user.email.split('@')[0]
+        : 'User'
+
+    // Use custom name when available, otherwise email username
+    const name = displayName || emailName
+
+    // Initial = first character of custom name/email username
     const initial = name.charAt(0).toUpperCase()
 
     return (
         <header className="flex h-16 items-center border-b border-gray-800 bg-gray-950 px-4 sm:px-6">
 
-            {/* Left side - Clickable SpendWise Logo */}
+            {/* SpendWise Logo + Name */}
 
             <button
                 type="button"
@@ -30,8 +38,7 @@ function Navbar({ menuOpen, setMenuOpen }) {
                 </h1>
             </button>
 
-
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu */}
 
             <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -42,7 +49,7 @@ function Navbar({ menuOpen, setMenuOpen }) {
             </button>
 
 
-            {/* Right side - Clickable Profile */}
+            {/* Profile */}
 
             <button
                 type="button"

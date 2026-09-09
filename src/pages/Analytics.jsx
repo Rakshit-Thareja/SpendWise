@@ -60,17 +60,17 @@ function Analytics({ expenses }) {
 
     const averageExpense =
         filteredExpenses.length > 0
-            ? totalExpenses / expenses.length
+            ? totalExpenses / filteredExpenses.length
             : 0
 
     const highestExpense =
-        expenses.length > 0
+        filteredExpenses.length > 0
             ? filteredExpenses.reduce(
                 (highest, expense) =>
                     expense.amount > highest.amount
                         ? expense
                         : highest,
-                expenses[0]
+                filteredExpenses[0]
             )
             : null
 
@@ -136,8 +136,8 @@ function Analytics({ expenses }) {
                             type="button"
                             onClick={() => setTimePeriod(period.value)}
                             className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
-                                    ? 'bg-indigo-500 text-white'
-                                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                                ? 'bg-indigo-500 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
                                 }`}
                         >
                             {period.label}
