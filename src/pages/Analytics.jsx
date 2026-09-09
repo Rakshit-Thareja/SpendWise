@@ -124,27 +124,26 @@ function Analytics({ expenses }) {
             </p>
             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
 
-            <div className="mt-6 flex flex-wrap gap-2">
-    {[
-        { value: 'all', label: 'All Time' },
-        { value: '7', label: 'Last 7 Days' },
-        { value: '30', label: 'Last 30 Days' },
-        { value: 'month', label: 'This Month' },
-    ].map((period) => (
-        <button
-            key={period.value}
-            type="button"
-            onClick={() => setTimePeriod(period.value)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                timePeriod === period.value
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-            }`}
-        >
-            {period.label}
-        </button>
-    ))}
-</div>
+                <div className="mt-6 flex flex-wrap gap-2">
+                    {[
+                        { value: 'all', label: 'All Time' },
+                        { value: '7', label: 'Last 7 Days' },
+                        { value: '30', label: 'Last 30 Days' },
+                        { value: 'month', label: 'This Month' },
+                    ].map((period) => (
+                        <button
+                            key={period.value}
+                            type="button"
+                            onClick={() => setTimePeriod(period.value)}
+                            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
+                                    ? 'bg-indigo-500 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                                }`}
+                        >
+                            {period.label}
+                        </button>
+                    ))}
+                </div>
 
                 {/* Total Spending */}
 
