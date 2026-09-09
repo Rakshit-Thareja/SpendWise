@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
     LineChart,
     Line,
@@ -10,20 +12,60 @@ import {
 
 function Analytics({ expenses }) {
 
+    const [timePeriod, setTimePeriod] = useState('all')
 
-    const totalExpenses = expenses.reduce(
+    const getStartDate = () => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        if (timePeriod === '7') {
+            const startDate = new Date(today)
+            startDate.setDate(today.getDate() - 6)
+            return startDate
+        }
+
+        if (timePeriod === '30') {
+            const startDate = new Date(today)
+            startDate.setDate(today.getDate() - 29)
+            return startDate
+        }
+
+        if (timePeriod === 'month') {
+            return new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
+            )
+        }
+
+        return null
+    }
+
+    const startDate = getStartDate()
+
+    const filteredExpenses = startDate
+        ? expenses.filter((expense) => {
+            const expenseDate = new Date(
+                `${expense.date}T00:00:00`
+            )
+
+            return expenseDate >= startDate
+        })
+        : expenses
+
+    const totalExpenses = filteredExpenses.reduce(
         (total, expense) => total + expense.amount,
         0
     )
 
     const averageExpense =
-        expenses.length > 0
+        filteredExpenses.length > 0
             ? totalExpenses / expenses.length
             : 0
 
     const highestExpense =
         expenses.length > 0
-            ? expenses.reduce(
+            ? filteredExpenses.reduce(
                 (highest, expense) =>
                     expense.amount > highest.amount
                         ? expense
@@ -32,7 +74,7 @@ function Analytics({ expenses }) {
             )
             : null
 
-    const categoryTotals = expenses.reduce((totals, expense) => {
+    const categoryTotals = filteredExpenses.reduce((totals, expense) => {
         if (totals[expense.category]) {
             totals[expense.category] += expense.amount
         } else {
@@ -50,7 +92,7 @@ function Analytics({ expenses }) {
         ['', 0]
     )
 
-    const dailySpending = expenses.reduce((totals, expense) => {
+    const dailySpending = filteredExpenses.reduce((totals, expense) => {
         if (totals[expense.date]) {
             totals[expense.date] += expense.amount
         } else {
@@ -81,6 +123,28 @@ function Analytics({ expenses }) {
                 Understand your spending patterns and make smarter financial decisions.
             </p>
             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+            <div className="mt-6 flex flex-wrap gap-2">
+    {[
+        { value: 'all', label: 'All Time' },
+        { value: '7', label: 'Last 7 Days' },
+        { value: '30', label: 'Last 30 Days' },
+        { value: 'month', label: 'This Month' },
+    ].map((period) => (
+        <button
+            key={period.value}
+            type="button"
+            onClick={() => setTimePeriod(period.value)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                timePeriod === period.value
+                    ? 'bg-indigo-500 text-white'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
+        >
+            {period.label}
+        </button>
+    ))}
+</div>
 
                 {/* Total Spending */}
 
