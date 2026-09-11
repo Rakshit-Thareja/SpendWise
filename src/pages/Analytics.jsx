@@ -137,8 +137,8 @@ function Analytics({ expenses }) {
                         type="button"
                         onClick={() => setTimePeriod(period.value)}
                         className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
-                                ? 'bg-indigo-500 text-white'
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                            ? 'bg-indigo-500 text-white'
+                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
                             }`}
                     >
                         {period.label}
@@ -162,7 +162,13 @@ function Analytics({ expenses }) {
                     </p>
 
                     <p className="mt-1 text-sm text-gray-500">
-                        Across all expenses
+                        {timePeriod === 'all'
+                            ? 'Across all expenses'
+                            : timePeriod === '7'
+                                ? 'Across the last 7 days'
+                                : timePeriod === '30'
+                                    ? 'Across the last 30 days'
+                                    : 'Across this month'}
                     </p>
                 </div>
 
@@ -179,6 +185,16 @@ function Analytics({ expenses }) {
 
                     <p className="mt-1 text-sm text-gray-500">
                         Per transaction
+                        {timePeriod !== 'all' && (
+                            <>
+                                {' '}during{' '}
+                                {timePeriod === '7'
+                                    ? 'the last 7 days'
+                                    : timePeriod === '30'
+                                        ? 'the last 30 days'
+                                        : 'this month'}
+                            </>
+                        )}
                     </p>
                 </div>
 
