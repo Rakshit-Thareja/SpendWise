@@ -13,6 +13,7 @@ function Expenses({
 
     const [searchTerm, setSearchTerm] = useState('')
     const [categoryFilter, setCategoryFilter] = useState('All')
+    const [sortBy, setSortBy] = useState('newest')
 
     const [errorMessage, setErrorMessage] = useState('')
 
@@ -114,6 +115,28 @@ function Expenses({
 
         return matchesSearch && matchesCategory
     })
+
+    const sortedExpenses = [...filteredExpenses].sort(
+        (a, b) => {
+            if (sortBy === 'newest') {
+                return b.date.localeCompare(a.date)
+            }
+
+            if (sortBy === 'oldest') {
+                return a.date.localeCompare(b.date)
+            }
+
+            if (sortBy === 'highest') {
+                return b.amount - a.amount
+            }
+
+            if (sortBy === 'lowest') {
+                return a.amount - b.amount
+            }
+
+            return 0
+        }
+    )
 
     // Transaction Snapshot data
 
@@ -441,7 +464,9 @@ function Expenses({
 
                 {/* Search & Filter */}
 
-                <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+                    {/* Search */}
 
                     <input
                         type="text"
@@ -452,6 +477,8 @@ function Expenses({
                         }
                         className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
                     />
+
+                    {/* Category */}
 
                     <select
                         value={categoryFilter}
@@ -469,6 +496,32 @@ function Expenses({
                                 {category}
                             </option>
                         ))}
+                    </select>
+
+                    {/* Sort */}
+
+                    <select
+                        value={sortBy}
+                        onChange={(event) =>
+                            setSortBy(event.target.value)
+                        }
+                        className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
+                    >
+                        <option value="newest">
+                            Newest First
+                        </option>
+
+                        <option value="oldest">
+                            Oldest First
+                        </option>
+
+                        <option value="highest">
+                            Highest Amount
+                        </option>
+
+                        <option value="lowest">
+                            Lowest Amount
+                        </option>
                     </select>
 
                 </div>
@@ -511,7 +564,7 @@ function Expenses({
 
                     ) : (
 
-                        filteredExpenses.map((expense) => (
+                        sortedExpenses.map((expense) => (
 
                             <div
                                 key={expense.id}
