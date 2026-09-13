@@ -15,6 +15,12 @@ function Expenses({
     const [categoryFilter, setCategoryFilter] = useState('All')
     const [sortBy, setSortBy] = useState('newest')
 
+    const clearFilters = () => {
+        setSearchTerm('')
+        setCategoryFilter('All')
+        setSortBy('newest')
+    }
+
     const [errorMessage, setErrorMessage] = useState('')
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -524,6 +530,20 @@ function Expenses({
                         </option>
                     </select>
 
+                </div>
+
+                <div className="mt-3 flex justify-end">
+                    {(searchTerm || categoryFilter !== 'All' || sortBy !== 'newest') && (
+                        <div className="mt-3 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
+                    )}
                 </div>
 
 
