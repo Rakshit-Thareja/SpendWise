@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 function RecentTransactions({ expenses }) {
     return (
         <div className="mt-6 rounded-xl border border-gray-800 bg-gray-900 p-5">
@@ -12,9 +14,12 @@ function RecentTransactions({ expenses }) {
                     </p>
                 </div>
 
-                <button className="text-sm text-indigo-400 hover:text-indigo-300">
+                <Link
+                    to="/expenses"
+                    className="text-sm text-indigo-400 transition hover:text-indigo-300"
+                >
                     View All →
-                </button>
+                </Link>
             </div>
 
             <div className="space-y-3">
