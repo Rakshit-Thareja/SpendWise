@@ -114,6 +114,65 @@ function Settings({
         URL.revokeObjectURL(url)
     }
 
+    const handleExportCSV = () => {
+        if (expenses.length === 0) {
+            setImportMessage({
+                text: 'No expenses available to export.',
+                type: 'error',
+            })
+            return
+        }
+
+        const headers = [
+            'Date',
+            'Description',
+            'Category',
+            'Payment Method',
+            'Amount',
+        ]
+
+        const rows = expenses.map((expense) => [
+            expense.date,
+            `"${expense.description.replace(/"/g, '""')}"`,
+            expense.category,
+            expense.paymentMethod,
+            expense.amount,
+        ])
+
+        const csv = [
+            headers.join(','),
+            ...rows.map((row) => row.join(',')),
+        ].join('\n')
+
+        const blob = new Blob([csv], {
+            type: 'text/csv;charset=utf-8;',
+        })
+
+        const url = URL.createObjectURL(blob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'spendwise-expenses.csv'
+
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        URL.revokeObjectURL(url)
+
+        setImportMessage({
+            text: 'Expenses exported as CSV.',
+            type: 'success',
+        })
+
+        setTimeout(() => {
+            setImportMessage({
+                text: '',
+                type: '',
+            })
+        }, 3000)
+    }
+
     const handleReset = async () => {
         if (resetting) {
             return
@@ -262,11 +321,10 @@ function Settings({
 
                     {nameMessage.text && (
                         <p
-                            className={`mt-3 text-sm ${
-                                nameMessage.type === 'success'
-                                    ? 'text-green-400'
-                                    : 'text-red-400'
-                            }`}
+                            className={`mt-3 text-sm ${nameMessage.type === 'success'
+                                ? 'text-green-400'
+                                : 'text-red-400'
+                                }`}
                         >
                             {nameMessage.type === 'success' ? '✅' : '⚠️'}{' '}
                             {nameMessage.text}
@@ -325,17 +383,23 @@ function Settings({
                         variant="secondary"
                         onClick={handleExport}
                     >
-                        Export Data
+                        Export JSON
+                    </Button>
+
+                    <Button
+                        variant="secondary"
+                        onClick={handleExportCSV}
+                    >
+                        Export CSV
                     </Button>
                 </div>
 
                 {importMessage.text && (
                     <p
-                        className={`mt-3 text-sm ${
-                            importMessage.type === 'success'
-                                ? 'text-green-400'
-                                : 'text-red-400'
-                        }`}
+                        className={`mt-3 text-sm ${importMessage.type === 'success'
+                            ? 'text-green-400'
+                            : 'text-red-400'
+                            }`}
                     >
                         {importMessage.type === 'success' ? '✅' : '⚠️'}{' '}
                         {importMessage.text}
