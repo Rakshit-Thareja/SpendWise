@@ -58,6 +58,8 @@ function Analytics({ expenses }) {
         0
     )
 
+    const totalTransactions = filteredExpenses.length
+
     const averageExpense =
         filteredExpenses.length > 0
             ? totalExpenses / filteredExpenses.length
@@ -148,7 +150,7 @@ function Analytics({ expenses }) {
 
             {/* Summary Cards */}
 
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
 
                 {/* Total Spending */}
 
@@ -218,7 +220,30 @@ function Analytics({ expenses }) {
                     </p>
                 </div>
 
+                {/* Total Transactions */}
+
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
+                    <p className="text-sm text-gray-400">
+                        Total Transactions
+                    </p>
+
+                    <p className="mt-2 text-3xl font-bold text-white">
+                        {totalTransactions}
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        {timePeriod === 'all'
+                            ? 'Across all expenses'
+                            : timePeriod === '7'
+                                ? 'In the last 7 days'
+                                : timePeriod === '30'
+                                    ? 'In the last 30 days'
+                                    : 'This month'}
+                    </p>
+                </div>
+
             </div>
+            
             <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
 
                 <h3 className="text-xl font-semibold text-white">
