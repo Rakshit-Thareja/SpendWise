@@ -60,6 +60,56 @@ function Analytics({ expenses }) {
 
     const totalTransactions = filteredExpenses.length
 
+    // 7-Day Spending Comparison
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Current 7 days: today + previous 6 days
+    const current7Start = new Date(today)
+    current7Start.setDate(today.getDate() - 6)
+
+    // Previous 7 days: days -13 through -7
+    const previous7Start = new Date(today)
+    previous7Start.setDate(today.getDate() - 13)
+
+    const previous7End = new Date(today)
+    previous7End.setDate(today.getDate() - 7)
+
+    const current7Expenses = expenses.filter((expense) => {
+        const expenseDate = new Date(
+            `${expense.date}T00:00:00`
+        )
+
+        return expenseDate >= current7Start
+    })
+
+    const previous7Expenses = expenses.filter((expense) => {
+        const expenseDate = new Date(
+            `${expense.date}T00:00:00`
+        )
+
+        return (
+            expenseDate >= previous7Start &&
+            expenseDate <= previous7End
+        )
+    })
+
+    const current7Total = current7Expenses.reduce(
+        (total, expense) => total + expense.amount,
+        0
+    )
+
+    const previous7Total = previous7Expenses.reduce(
+        (total, expense) => total + expense.amount,
+        0
+    )
+
+    const spendingChange =
+        previous7Total > 0
+            ? ((current7Total - previous7Total) / previous7Total) * 100
+            : null
+
     const averageExpense =
         filteredExpenses.length > 0
             ? totalExpenses / filteredExpenses.length
@@ -242,8 +292,44 @@ function Analytics({ expenses }) {
                     </p>
                 </div>
 
+                <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-5 md:col-span-4">
+                    <p className="text-sm text-gray-400">
+                        Recent 7-Day Spending
+                    </p>
+
+                    {spendingChange !== null ? (
+                        <>
+                            <p
+                                className={`mt-2 text-3xl font-bold ${spendingChange > 0
+                                        ? 'text-red-400'
+                                        : spendingChange < 0
+                                            ? 'text-green-400'
+                                            : 'text-white'
+                                    }`}
+                            >
+                                {spendingChange > 0 ? '+' : ''}
+                                {spendingChange.toFixed(1)}%
+                            </p>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                Compared with the previous 7 days
+                            </p>
+
+                            <p className="mt-3 text-sm text-gray-400">
+                                Current: ₹{current7Total.toLocaleString('en-IN')}
+                                {' · '}
+                                Previous: ₹{previous7Total.toLocaleString('en-IN')}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="mt-2 text-sm text-gray-500">
+                            Not enough previous spending data to compare.
+                        </p>
+                    )}
+                </div>
+
             </div>
-            
+
             <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
 
                 <h3 className="text-xl font-semibold text-white">
