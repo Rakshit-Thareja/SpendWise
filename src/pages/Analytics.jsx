@@ -60,6 +60,23 @@ function Analytics({ expenses }) {
 
     const totalTransactions = filteredExpenses.length
 
+    // Today's spending
+
+    const todayDate = new Date()
+        .toISOString()
+        .split('T')[0]
+
+    const todayExpenses = expenses.filter(
+        (expense) => expense.date === todayDate
+    )
+
+    const todaySpending = todayExpenses.reduce(
+        (total, expense) => total + expense.amount,
+        0
+    )
+
+    const todayTransactions = todayExpenses.length
+
     // 7-Day Spending Comparison
 
     const today = new Date()
@@ -301,10 +318,10 @@ function Analytics({ expenses }) {
                         <>
                             <p
                                 className={`mt-2 text-3xl font-bold ${spendingChange > 0
-                                        ? 'text-red-400'
-                                        : spendingChange < 0
-                                            ? 'text-green-400'
-                                            : 'text-white'
+                                    ? 'text-red-400'
+                                    : spendingChange < 0
+                                        ? 'text-green-400'
+                                        : 'text-white'
                                     }`}
                             >
                                 {spendingChange > 0 ? '+' : ''}
@@ -326,6 +343,21 @@ function Analytics({ expenses }) {
                             Not enough previous spending data to compare.
                         </p>
                     )}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-5 md:col-span-4">
+                    <p className="text-sm text-gray-400">
+                        Today's Spending
+                    </p>
+
+                    <p className="mt-2 text-3xl font-bold text-white">
+                        ₹{todaySpending.toLocaleString('en-IN')}
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        {todayTransactions}{' '}
+                        {todayTransactions === 1 ? 'transaction' : 'transactions'} today
+                    </p>
                 </div>
 
             </div>
