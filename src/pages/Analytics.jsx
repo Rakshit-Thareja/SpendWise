@@ -11,7 +11,6 @@ import {
 } from 'recharts'
 
 function Analytics({ expenses }) {
-
     const [timePeriod, setTimePeriod] = useState('all')
 
     const getStartDate = () => {
@@ -62,9 +61,13 @@ function Analytics({ expenses }) {
 
     // Today's spending
 
-    const todayDate = new Date()
-        .toISOString()
-        .split('T')[0]
+    const today = new Date()
+
+    const todayDate = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, '0'),
+        String(today.getDate()).padStart(2, '0'),
+    ].join('-')
 
     const todayExpenses = expenses.filter(
         (expense) => expense.date === todayDate
@@ -79,19 +82,17 @@ function Analytics({ expenses }) {
 
     // 7-Day Spending Comparison
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const currentDay = new Date()
+    currentDay.setHours(0, 0, 0, 0)
 
-    // Current 7 days: today + previous 6 days
-    const current7Start = new Date(today)
-    current7Start.setDate(today.getDate() - 6)
+    const current7Start = new Date(currentDay)
+    current7Start.setDate(currentDay.getDate() - 6)
 
-    // Previous 7 days: days -13 through -7
-    const previous7Start = new Date(today)
-    previous7Start.setDate(today.getDate() - 13)
+    const previous7Start = new Date(currentDay)
+    previous7Start.setDate(currentDay.getDate() - 13)
 
-    const previous7End = new Date(today)
-    previous7End.setDate(today.getDate() - 7)
+    const previous7End = new Date(currentDay)
+    previous7End.setDate(currentDay.getDate() - 7)
 
     const current7Expenses = expenses.filter((expense) => {
         const expenseDate = new Date(
@@ -124,7 +125,9 @@ function Analytics({ expenses }) {
 
     const spendingChange =
         previous7Total > 0
-            ? ((current7Total - previous7Total) / previous7Total) * 100
+            ? ((current7Total - previous7Total) /
+                previous7Total) *
+              100
             : null
 
     const averageExpense =
@@ -143,15 +146,18 @@ function Analytics({ expenses }) {
             )
             : null
 
-    const categoryTotals = filteredExpenses.reduce((totals, expense) => {
-        if (totals[expense.category]) {
-            totals[expense.category] += expense.amount
-        } else {
-            totals[expense.category] = expense.amount
-        }
+    const categoryTotals = filteredExpenses.reduce(
+        (totals, expense) => {
+            if (totals[expense.category]) {
+                totals[expense.category] += expense.amount
+            } else {
+                totals[expense.category] = expense.amount
+            }
 
-        return totals
-    }, {})
+            return totals
+        },
+        {}
+    )
 
     const highestCategory = Object.entries(categoryTotals).reduce(
         (highest, current) =>
@@ -161,18 +167,23 @@ function Analytics({ expenses }) {
         ['', 0]
     )
 
-    const dailySpending = filteredExpenses.reduce((totals, expense) => {
-        if (totals[expense.date]) {
-            totals[expense.date] += expense.amount
-        } else {
-            totals[expense.date] = expense.amount
-        }
+    const dailySpending = filteredExpenses.reduce(
+        (totals, expense) => {
+            if (totals[expense.date]) {
+                totals[expense.date] += expense.amount
+            } else {
+                totals[expense.date] = expense.amount
+            }
 
-        return totals
-    }, {})
+            return totals
+        },
+        {}
+    )
 
     const dailySpendingData = Object.entries(dailySpending)
-        .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+        .sort(([dateA], [dateB]) =>
+            dateA.localeCompare(dateB)
+        )
         .map(([date, total]) => ({
             date,
             total,
@@ -180,6 +191,8 @@ function Analytics({ expenses }) {
 
     return (
         <div>
+            {/* Header */}
+
             <p className="text-sm font-medium text-indigo-400">
                 Financial Insights
             </p>
@@ -188,13 +201,14 @@ function Analytics({ expenses }) {
                 Analytics
             </h2>
 
-            <p className="mt-2 text-gray-400">
-                Understand your spending patterns and make smarter financial decisions.
+            <p className="mt-2 max-w-2xl text-gray-400">
+                Understand your spending patterns and make
+                smarter financial decisions.
             </p>
 
             {/* Time Period Filters */}
 
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap gap-2">
                 {[
                     { value: 'all', label: 'All Time' },
                     { value: '7', label: 'Last 7 Days' },
@@ -204,11 +218,14 @@ function Analytics({ expenses }) {
                     <button
                         key={period.value}
                         type="button"
-                        onClick={() => setTimePeriod(period.value)}
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
-                            ? 'bg-indigo-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                            }`}
+                        onClick={() =>
+                            setTimePeriod(period.value)
+                        }
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                            timePeriod === period.value
+                                ? 'bg-indigo-500 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                        }`}
                     >
                         {period.label}
                     </button>
@@ -217,8 +234,7 @@ function Analytics({ expenses }) {
 
             {/* Summary Cards */}
 
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4">
-
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {/* Total Spending */}
 
                 <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
@@ -275,12 +291,15 @@ function Analytics({ expenses }) {
                     </p>
 
                     <p className="mt-2 text-3xl font-bold text-red-400">
-                        ₹{highestExpense
-                            ? highestExpense.amount.toLocaleString('en-IN')
+                        ₹
+                        {highestExpense
+                            ? highestExpense.amount.toLocaleString(
+                                'en-IN'
+                            )
                             : 0}
                     </p>
 
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 truncate text-sm text-gray-500">
                         {highestExpense
                             ? highestExpense.description
                             : 'No expenses yet'}
@@ -308,62 +327,135 @@ function Analytics({ expenses }) {
                                     : 'This month'}
                     </p>
                 </div>
+            </div>
 
-                <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-5 md:col-span-4">
-                    <p className="text-sm text-gray-400">
-                        Recent 7-Day Spending
-                    </p>
+            {/* Additional Insights */}
+
+            <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* 7-Day Comparison */}
+
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-sm text-gray-400">
+                                Recent 7-Day Spending
+                            </p>
+
+                            <p className="mt-1 text-xs text-gray-500">
+                                Compared with the previous 7 days
+                            </p>
+                        </div>
+
+                        <span
+                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                                spendingChange === null
+                                    ? 'bg-gray-800 text-gray-400'
+                                    : spendingChange > 0
+                                        ? 'bg-red-500/10 text-red-400'
+                                        : spendingChange < 0
+                                            ? 'bg-green-500/10 text-green-400'
+                                            : 'bg-gray-800 text-gray-400'
+                            }`}
+                        >
+                            {spendingChange === null
+                                ? 'No comparison'
+                                : spendingChange > 0
+                                    ? 'Higher'
+                                    : spendingChange < 0
+                                        ? 'Lower'
+                                        : 'No change'}
+                        </span>
+                    </div>
 
                     {spendingChange !== null ? (
                         <>
                             <p
-                                className={`mt-2 text-3xl font-bold ${spendingChange > 0
-                                    ? 'text-red-400'
-                                    : spendingChange < 0
-                                        ? 'text-green-400'
-                                        : 'text-white'
-                                    }`}
+                                className={`mt-5 text-3xl font-bold ${
+                                    spendingChange > 0
+                                        ? 'text-red-400'
+                                        : spendingChange < 0
+                                            ? 'text-green-400'
+                                            : 'text-white'
+                                }`}
                             >
-                                {spendingChange > 0 ? '+' : ''}
+                                {spendingChange > 0
+                                    ? '+'
+                                    : ''}
                                 {spendingChange.toFixed(1)}%
                             </p>
 
-                            <p className="mt-1 text-sm text-gray-500">
-                                Compared with the previous 7 days
-                            </p>
+                            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                                <div>
+                                    <p className="text-gray-500">
+                                        Current 7 days
+                                    </p>
 
-                            <p className="mt-3 text-sm text-gray-400">
-                                Current: ₹{current7Total.toLocaleString('en-IN')}
-                                {' · '}
-                                Previous: ₹{previous7Total.toLocaleString('en-IN')}
-                            </p>
+                                    <p className="mt-1 font-medium text-gray-200">
+                                        ₹
+                                        {current7Total.toLocaleString(
+                                            'en-IN'
+                                        )}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-gray-500">
+                                        Previous 7 days
+                                    </p>
+
+                                    <p className="mt-1 font-medium text-gray-200">
+                                        ₹
+                                        {previous7Total.toLocaleString(
+                                            'en-IN'
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
                         </>
                     ) : (
-                        <p className="mt-2 text-sm text-gray-500">
-                            Not enough previous spending data to compare.
+                        <p className="mt-5 text-sm text-gray-500">
+                            Not enough previous spending data
+                            to compare.
                         </p>
                     )}
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-5 md:col-span-4">
-                    <p className="text-sm text-gray-400">
-                        Today's Spending
-                    </p>
+                {/* Today's Spending */}
 
-                    <p className="mt-2 text-3xl font-bold text-white">
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-sm text-gray-400">
+                                Today's Spending
+                            </p>
+
+                            <p className="mt-1 text-xs text-gray-500">
+                                Spending activity for today
+                            </p>
+                        </div>
+
+                        <span className="rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-400">
+                            Today
+                        </span>
+                    </div>
+
+                    <p className="mt-5 text-3xl font-bold text-white">
                         ₹{todaySpending.toLocaleString('en-IN')}
                     </p>
 
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-gray-500">
                         {todayTransactions}{' '}
-                        {todayTransactions === 1 ? 'transaction' : 'transactions'} today
+                        {todayTransactions === 1
+                            ? 'transaction'
+                            : 'transactions'}{' '}
+                        today
                     </p>
                 </div>
-
             </div>
 
-            <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
+            {/* Spending by Category */}
 
+            <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
                 <h3 className="text-xl font-semibold text-white">
                     Spending by Category
                 </h3>
@@ -372,48 +464,67 @@ function Analytics({ expenses }) {
                     See where most of your money is going.
                 </p>
 
-                <div className="mt-6 space-y-5">
-                    {Object.entries(categoryTotals).map(
-                        ([category, total]) => {
-                            const percentage =
-                                totalExpenses > 0
-                                    ? (total / totalExpenses) * 100
-                                    : 0
+                {Object.keys(categoryTotals).length > 0 ? (
+                    <div className="mt-6 space-y-5">
+                        {Object.entries(categoryTotals).map(
+                            ([category, total]) => {
+                                const percentage =
+                                    totalExpenses > 0
+                                        ? (total /
+                                            totalExpenses) *
+                                          100
+                                        : 0
 
-                            return (
-                                <div key={category}>
-                                    <div className="flex justify-between">
-                                        <span className="font-medium text-white">
-                                            {category}
-                                        </span>
+                                return (
+                                    <div key={category}>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="font-medium text-white">
+                                                {category}
+                                            </span>
 
-                                        <span className="text-sm text-gray-400">
-                                            ₹{total.toLocaleString('en-IN')}
-                                        </span>
+                                            <span className="text-sm text-gray-400">
+                                                ₹
+                                                {total.toLocaleString(
+                                                    'en-IN'
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
+                                            <div
+                                                className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                                                style={{
+                                                    width: `${percentage}%`,
+                                                }}
+                                            />
+                                        </div>
+
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            {percentage.toFixed(
+                                                1
+                                            )}
+                                            % of total spending
+                                        </p>
                                     </div>
-
-                                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
-                                        <div
-                                            className="h-full rounded-full bg-indigo-500 transition-all duration-500"
-                                            style={{
-                                                width: `${percentage}%`,
-                                            }}
-                                        />
-                                    </div>
-
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        {percentage.toFixed(1)}% of total spending
-                                    </p>
-                                </div>
-                            )
-                        }
-                    )}
-                </div>
+                                )
+                            }
+                        )}
+                    </div>
+                ) : (
+                    <div className="mt-6 flex h-32 items-center justify-center rounded-xl border border-dashed border-gray-700">
+                        <p className="text-sm text-gray-500">
+                            No expenses for this period.
+                        </p>
+                    </div>
+                )}
             </div>
+
+            {/* Spending Insight */}
+
             {highestCategory[1] > 0 && (
                 <div className="mt-6 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-5">
                     <p className="text-sm font-medium text-indigo-400">
-                        💡 Spending Insight
+                        Spending Insight
                     </p>
 
                     <p className="mt-2 text-white">
@@ -423,11 +534,17 @@ function Analytics({ expenses }) {
                         </span>{' '}
                         at{' '}
                         <span className="font-semibold">
-                            ₹{highestCategory[1].toLocaleString('en-IN')}
-                        </span>.
+                            ₹
+                            {highestCategory[1].toLocaleString(
+                                'en-IN'
+                            )}
+                        </span>
+                        .
                     </p>
                 </div>
             )}
+
+            {/* Spending Trend */}
 
             <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
                 <h3 className="text-xl font-semibold text-white">
@@ -440,39 +557,58 @@ function Analytics({ expenses }) {
 
                 {dailySpendingData.length > 0 ? (
                     <div className="mt-6 h-80">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                        >
                             <LineChart data={dailySpendingData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="#374151"
+                                />
 
                                 <XAxis
                                     dataKey="date"
                                     stroke="#9CA3AF"
                                     tickFormatter={(date) =>
-                                        new Date(date).toLocaleDateString('en-IN', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                        })
+                                        new Date(
+                                            `${date}T00:00:00`
+                                        ).toLocaleDateString(
+                                            'en-IN',
+                                            {
+                                                day: 'numeric',
+                                                month: 'short',
+                                            }
+                                        )
                                     }
                                 />
 
-                                <YAxis
-                                    stroke="#9CA3AF"
-                                />
+                                <YAxis stroke="#9CA3AF" />
 
                                 <Tooltip
                                     labelFormatter={(date) =>
-                                        new Date(date).toLocaleDateString('en-IN', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                        })
+                                        new Date(
+                                            `${date}T00:00:00`
+                                        ).toLocaleDateString(
+                                            'en-IN',
+                                            {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric',
+                                            }
+                                        )
                                     }
                                     formatter={(value) => [
-                                        `₹${Number(value).toLocaleString('en-IN')}`,
+                                        `₹${Number(
+                                            value
+                                        ).toLocaleString(
+                                            'en-IN'
+                                        )}`,
                                         'Spending',
                                     ]}
                                     contentStyle={{
-                                        backgroundColor: '#111827',
+                                        backgroundColor:
+                                            '#111827',
                                         border: '1px solid #374151',
                                         borderRadius: '8px',
                                         color: '#fff',
