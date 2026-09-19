@@ -127,7 +127,7 @@ function Analytics({ expenses }) {
         previous7Total > 0
             ? ((current7Total - previous7Total) /
                 previous7Total) *
-              100
+            100
             : null
 
     const averageExpense =
@@ -152,6 +152,23 @@ function Analytics({ expenses }) {
                 totals[expense.category] += expense.amount
             } else {
                 totals[expense.category] = expense.amount
+            }
+
+            return totals
+        },
+        {}
+    )
+
+    // Payment Method Breakdown
+
+    const paymentMethodTotals = filteredExpenses.reduce(
+        (totals, expense) => {
+            const method = expense.paymentMethod || 'Unknown'
+
+            if (totals[method]) {
+                totals[method] += expense.amount
+            } else {
+                totals[method] = expense.amount
             }
 
             return totals
@@ -221,11 +238,10 @@ function Analytics({ expenses }) {
                         onClick={() =>
                             setTimePeriod(period.value)
                         }
-                        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                            timePeriod === period.value
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
                                 ? 'bg-indigo-500 text-white'
                                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                        }`}
+                            }`}
                     >
                         {period.label}
                     </button>
@@ -347,15 +363,14 @@ function Analytics({ expenses }) {
                         </div>
 
                         <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                                spendingChange === null
+                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${spendingChange === null
                                     ? 'bg-gray-800 text-gray-400'
                                     : spendingChange > 0
                                         ? 'bg-red-500/10 text-red-400'
                                         : spendingChange < 0
                                             ? 'bg-green-500/10 text-green-400'
                                             : 'bg-gray-800 text-gray-400'
-                            }`}
+                                }`}
                         >
                             {spendingChange === null
                                 ? 'No comparison'
@@ -370,13 +385,12 @@ function Analytics({ expenses }) {
                     {spendingChange !== null ? (
                         <>
                             <p
-                                className={`mt-5 text-3xl font-bold ${
-                                    spendingChange > 0
+                                className={`mt-5 text-3xl font-bold ${spendingChange > 0
                                         ? 'text-red-400'
                                         : spendingChange < 0
                                             ? 'text-green-400'
                                             : 'text-white'
-                                }`}
+                                    }`}
                             >
                                 {spendingChange > 0
                                     ? '+'
@@ -472,7 +486,7 @@ function Analytics({ expenses }) {
                                     totalExpenses > 0
                                         ? (total /
                                             totalExpenses) *
-                                          100
+                                        100
                                         : 0
 
                                 return (
@@ -504,6 +518,67 @@ function Analytics({ expenses }) {
                                                 1
                                             )}
                                             % of total spending
+                                        </p>
+                                    </div>
+                                )
+                            }
+                        )}
+                    </div>
+                ) : (
+                    <div className="mt-6 flex h-32 items-center justify-center rounded-xl border border-dashed border-gray-700">
+                        <p className="text-sm text-gray-500">
+                            No expenses for this period.
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Spending by Payment Method */}
+
+            <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
+                <h3 className="text-xl font-semibold text-white">
+                    Spending by Payment Method
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-400">
+                    See how you are paying for your expenses.
+                </p>
+
+                {Object.keys(paymentMethodTotals).length > 0 ? (
+                    <div className="mt-6 space-y-5">
+                        {Object.entries(paymentMethodTotals).map(
+                            ([method, total]) => {
+                                const percentage =
+                                    totalExpenses > 0
+                                        ? (total / totalExpenses) * 100
+                                        : 0
+
+                                return (
+                                    <div key={method}>
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="font-medium text-white">
+                                                {method}
+                                            </span>
+
+                                            <span className="text-sm text-gray-400">
+                                                ₹
+                                                {total.toLocaleString(
+                                                    'en-IN'
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-800">
+                                            <div
+                                                className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                                                style={{
+                                                    width: `${percentage}%`,
+                                                }}
+                                            />
+                                        </div>
+
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            {percentage.toFixed(1)}% of total spending
                                         </p>
                                     </div>
                                 )
