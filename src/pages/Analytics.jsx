@@ -166,9 +166,13 @@ function Analytics({ expenses }) {
             const method = expense.paymentMethod || 'Unknown'
 
             if (totals[method]) {
-                totals[method] += expense.amount
+                totals[method].amount += expense.amount
+                totals[method].count += 1
             } else {
-                totals[method] = expense.amount
+                totals[method] = {
+                    amount: expense.amount,
+                    count: 1,
+                }
             }
 
             return totals
@@ -239,8 +243,8 @@ function Analytics({ expenses }) {
                             setTimePeriod(period.value)
                         }
                         className={`rounded-lg px-4 py-2 text-sm font-medium transition ${timePeriod === period.value
-                                ? 'bg-indigo-500 text-white'
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                            ? 'bg-indigo-500 text-white'
+                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
                             }`}
                     >
                         {period.label}
@@ -364,12 +368,12 @@ function Analytics({ expenses }) {
 
                         <span
                             className={`rounded-full px-2.5 py-1 text-xs font-medium ${spendingChange === null
-                                    ? 'bg-gray-800 text-gray-400'
-                                    : spendingChange > 0
-                                        ? 'bg-red-500/10 text-red-400'
-                                        : spendingChange < 0
-                                            ? 'bg-green-500/10 text-green-400'
-                                            : 'bg-gray-800 text-gray-400'
+                                ? 'bg-gray-800 text-gray-400'
+                                : spendingChange > 0
+                                    ? 'bg-red-500/10 text-red-400'
+                                    : spendingChange < 0
+                                        ? 'bg-green-500/10 text-green-400'
+                                        : 'bg-gray-800 text-gray-400'
                                 }`}
                         >
                             {spendingChange === null
@@ -386,10 +390,10 @@ function Analytics({ expenses }) {
                         <>
                             <p
                                 className={`mt-5 text-3xl font-bold ${spendingChange > 0
-                                        ? 'text-red-400'
-                                        : spendingChange < 0
-                                            ? 'text-green-400'
-                                            : 'text-white'
+                                    ? 'text-red-400'
+                                    : spendingChange < 0
+                                        ? 'text-green-400'
+                                        : 'text-white'
                                     }`}
                             >
                                 {spendingChange > 0
@@ -547,22 +551,31 @@ function Analytics({ expenses }) {
                 {Object.keys(paymentMethodTotals).length > 0 ? (
                     <div className="mt-6 space-y-5">
                         {Object.entries(paymentMethodTotals).map(
-                            ([method, total]) => {
+                            ([method, data]) => {
                                 const percentage =
                                     totalExpenses > 0
-                                        ? (total / totalExpenses) * 100
+                                        ? (data.amount / totalExpenses) * 100
                                         : 0
 
                                 return (
                                     <div key={method}>
                                         <div className="flex items-center justify-between gap-4">
-                                            <span className="font-medium text-white">
-                                                {method}
-                                            </span>
+                                            <div>
+                                                <p className="font-medium text-white">
+                                                    {method}
+                                                </p>
+
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    {data.count}{' '}
+                                                    {data.count === 1
+                                                        ? 'transaction'
+                                                        : 'transactions'}
+                                                </p>
+                                            </div>
 
                                             <span className="text-sm text-gray-400">
                                                 ₹
-                                                {total.toLocaleString(
+                                                {data.amount.toLocaleString(
                                                     'en-IN'
                                                 )}
                                             </span>
