@@ -349,6 +349,18 @@ function Analytics({ expenses }) {
                 </div>
             </div>
 
+            {filteredExpenses.length === 0 && (
+                <div className="mt-6 rounded-2xl border border-dashed border-gray-700 bg-gray-900/50 p-6 text-center">
+                    <p className="text-lg font-medium text-white">
+                        No expenses for this period
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                        Try selecting a different time period or add a new expense.
+                    </p>
+                </div>
+            )}
+
             {/* Additional Insights */}
 
             <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -722,7 +734,10 @@ function Analytics({ expenses }) {
                     </div>
                 )}
             </div>
+
         </div>
+
+
     )
 }
 
