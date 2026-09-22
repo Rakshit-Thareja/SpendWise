@@ -605,12 +605,11 @@ function Expenses({
                                         </p>
 
                                         <p className="mt-1 text-sm text-gray-400">
-                                            {expense.category} • {expense.date}
+                                            {expense.category} • {expense.date} • {expense.paymentMethod || 'Unknown'}
                                         </p>
                                     </div>
 
                                 </div>
-
 
                                 {/* Amount & Actions */}
 
