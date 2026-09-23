@@ -152,7 +152,9 @@ function Settings({
 
         const link = document.createElement('a')
         link.href = url
-        link.download = 'spendwise-expenses.csv'
+        const exportDate = new Date().toISOString().split('T')[0]
+
+        link.download = `spendwise-expenses-${exportDate}.csv`
 
         document.body.appendChild(link)
         link.click()
