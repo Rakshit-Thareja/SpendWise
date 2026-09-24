@@ -105,7 +105,10 @@ function Settings({
 
         const link = document.createElement('a')
         link.href = url
-        link.download = 'spendwise-backup.json'
+
+        const exportDate = new Date().toISOString().split('T')[0]
+
+        link.download = `spendwise-backup-${exportDate}.json`
 
         document.body.appendChild(link)
         link.click()
