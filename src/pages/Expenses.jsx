@@ -682,10 +682,10 @@ function Expenses({
                                 {expenseToDelete.description}
                             </p>
 
-                            <div className="mt-1 flex items-center justify-between">
-
+                            <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
                                 <p className="text-sm text-gray-500">
-                                    {expenseToDelete.category}
+                                    {expenseToDelete.category} •{' '}
+                                    {expenseToDelete.paymentMethod || 'Unknown'}
                                 </p>
 
                                 <p className="font-semibold text-red-400">
@@ -693,7 +693,6 @@ function Expenses({
                                         'en-IN'
                                     )}
                                 </p>
-
                             </div>
 
                         </div>
