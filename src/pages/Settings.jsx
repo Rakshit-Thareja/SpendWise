@@ -134,11 +134,15 @@ function Settings({
             'Amount',
         ]
 
+        const escapeCSV = (value) => {
+            return `"${String(value ?? '').replace(/"/g, '""')}"`
+        }
+
         const rows = expenses.map((expense) => [
-            expense.date,
-            `"${expense.description.replace(/"/g, '""')}"`,
-            expense.category,
-            expense.paymentMethod,
+            escapeCSV(expense.date),
+            escapeCSV(expense.description),
+            escapeCSV(expense.category),
+            escapeCSV(expense.paymentMethod || 'Unknown'),
             expense.amount,
         ])
 
