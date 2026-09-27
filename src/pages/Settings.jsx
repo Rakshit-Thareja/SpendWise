@@ -376,6 +376,41 @@ function Settings({
                     </div>
                 </div>
 
+                <div className="mt-6 rounded-lg border border-gray-800 bg-gray-950 p-4">
+                    <p className="text-sm font-medium text-white">
+                        Backup Summary
+                    </p>
+
+                    <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div>
+                            <p className="text-xs text-gray-500">
+                                Expenses
+                            </p>
+                            <p className="mt-1 font-semibold text-white">
+                                {expenses.length}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="text-xs text-gray-500">
+                                Income
+                            </p>
+                            <p className="mt-1 font-semibold text-white">
+                                ₹{income.toLocaleString('en-IN')}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="text-xs text-gray-500">
+                                Budget Categories
+                            </p>
+                            <p className="mt-1 font-semibold text-white">
+                                {Object.keys(budgets).length}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                     <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-700 px-4 py-3 font-semibold text-gray-200 transition hover:bg-gray-800">
                         Import Data
