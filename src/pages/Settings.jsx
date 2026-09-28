@@ -215,6 +215,18 @@ function Settings({
             return
         }
 
+        const MAX_BACKUP_SIZE = 5 * 1024 * 1024
+
+        if (file.size > MAX_BACKUP_SIZE) {
+            setImportMessage({
+                text: 'Backup file is too large. Maximum allowed size is 5 MB.',
+                type: 'error',
+            })
+
+            event.target.value = ''
+            return
+        }
+
         const reader = new FileReader()
 
         reader.onload = async (event) => {
