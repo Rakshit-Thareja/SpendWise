@@ -215,6 +215,19 @@ function Settings({
             return
         }
 
+        if (
+            file.type !== 'application/json' &&
+            !file.name.toLowerCase().endsWith('.json')
+        ) {
+            setImportMessage({
+                text: 'Please select a valid JSON backup file.',
+                type: 'error',
+            })
+
+            event.target.value = ''
+            return
+        }
+
         const MAX_BACKUP_SIZE = 5 * 1024 * 1024
 
         if (file.size > MAX_BACKUP_SIZE) {
