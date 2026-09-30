@@ -115,6 +115,18 @@ function Settings({
         document.body.removeChild(link)
 
         URL.revokeObjectURL(url)
+
+        setImportMessage({
+            text: 'Backup exported successfully.',
+            type: 'success',
+        })
+
+        setTimeout(() => {
+            setImportMessage({
+                text: '',
+                type: '',
+            })
+        }, 3000)
     }
 
     const handleExportCSV = () => {
