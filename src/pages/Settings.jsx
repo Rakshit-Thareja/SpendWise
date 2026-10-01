@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Button from '../components/Button'
 import LogoutButton from '../components/LogoutButton'
@@ -25,6 +25,8 @@ function Settings({
         text: '',
         type: '',
     })
+
+    const messageTimeoutRef = useRef(null)
 
     const [showResetConfirm, setShowResetConfirm] = useState(false)
     const [resetting, setResetting] = useState(false)
@@ -88,6 +90,34 @@ function Settings({
         }
     }
 
+    const showImportMessage = (text, type) => {
+        if (messageTimeoutRef.current) {
+            clearTimeout(messageTimeoutRef.current)
+        }
+
+        setImportMessage({
+            text,
+            type,
+        })
+
+        messageTimeoutRef.current = setTimeout(() => {
+            setImportMessage({
+                text: '',
+                type: '',
+            })
+
+            messageTimeoutRef.current = null
+        }, 3000)
+    }
+
+    useEffect(() => {
+        return () => {
+            if (messageTimeoutRef.current) {
+                clearTimeout(messageTimeoutRef.current)
+            }
+        }
+    }, [])
+
     const handleExport = () => {
         const backupData = {
             expenses,
@@ -116,17 +146,7 @@ function Settings({
 
         URL.revokeObjectURL(url)
 
-        setImportMessage({
-            text: 'Backup exported successfully.',
-            type: 'success',
-        })
-
-        setTimeout(() => {
-            setImportMessage({
-                text: '',
-                type: '',
-            })
-        }, 3000)
+        showImportMessage('Backup exported successfully.', 'success')
     }
 
     const handleExportCSV = () => {
@@ -181,17 +201,7 @@ function Settings({
 
         URL.revokeObjectURL(url)
 
-        setImportMessage({
-            text: 'Expenses exported as CSV.',
-            type: 'success',
-        })
-
-        setTimeout(() => {
-            setImportMessage({
-                text: '',
-                type: '',
-            })
-        }, 3000)
+        showImportMessage('Expenses exported as CSV.', 'success')
     }
 
     const handleReset = async () => {
@@ -276,17 +286,8 @@ function Settings({
 
                 await onRestoreData(backupData)
 
-                setImportMessage({
-                    text: 'Data imported successfully.',
-                    type: 'success',
-                })
+                showImportMessage('Data imported successfully.', 'success')
 
-                setTimeout(() => {
-                    setImportMessage({
-                        text: '',
-                        type: '',
-                    })
-                }, 3000)
             } catch (error) {
                 setImportMessage({
                     text: 'Invalid SpendWise backup file.',
